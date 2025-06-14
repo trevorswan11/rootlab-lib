@@ -4,12 +4,12 @@ packages = ["rootlab_lib"]
 
 [project]
 name = "rootlab_lib"
-version = "0.1.0"
+version = "0.2.0"
 description = "RootLab data analysis tools"
 readme = "README.md"
 authors = [
-    { name = "Samuel Root", email = "ser132@case.edu" },
     { name = "Trevor Swan", email = "tcs94@case.edu" }
+    { name = "Samuel Root", email = "ser132@case.edu" },
 ]
 requires-python = ">=3.7"
 dependencies = [
