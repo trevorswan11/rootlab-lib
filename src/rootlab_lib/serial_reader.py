@@ -6,6 +6,7 @@ import time
 import os
 from typing import List, Tuple
 import random
+from .voltage_analysis import _plot_voltage_series
 
 
 class _MockSerial:
@@ -25,7 +26,7 @@ def gather_data(
     baudrate: str = 9600,
     output_dir: str = ".",
     mock: bool = False,
-    thresh: int = 40,
+    thresh: int = 20,
 ) -> Tuple[List[float], List[float]]:
     """
     Reads and plots serial data in real-time, and saves to a timestamped .txt file.
@@ -67,10 +68,35 @@ def gather_data(
         (line,) = ax.plot([], [], color="blue")
         ax.set_xlabel("Time (s)")
         ax.set_ylabel("Voltage (V)")
-        ax.set_title("Voltage vs. Time")
+        title = "Voltage vs. Time"
+        ax.set_title(title)
         ax.grid(True)
         
         num_readings = 0
+        
+        def finalize_and_save_plot():
+            line.set_xdata(t_data)
+            line.set_ydata(v_data)
+            ax.relim()
+            ax.autoscale_view()
+            fig.canvas.draw()
+            fig.canvas.flush_events()
+            plt.ioff()
+            print(f"Saving {os.path.abspath(image_path)}")
+            print(f"\tCurrent File: {image_name}")
+            plt.savefig(image_path)
+            plt.close()
+            
+        def save_as():
+            plt.figure(figsize=(12, 6))
+            plt.plot(t_data, v_data, label=title)
+            plt.title(title, fontsize=25)
+            plt.grid(True)
+            plt.xlabel("Time (s)", fontsize=25)
+            plt.ylabel("Voltage (V)", fontsize=25)
+            plt.tick_params(labelsize=25, width=2, length=7)
+            plt.savefig(image_path)
+            plt.close()
 
         with open(text_path, "w") as f:
             while True:
@@ -105,26 +131,13 @@ def gather_data(
                 except Exception as e:
                     print(f"Data read error: {e}")
 
-        # Finalize the plot and make static
-        plt.ioff()
-        fig.canvas.draw()
-        plt.show()
-        print(f"Saving {os.path.abspath(image_path)}")
-        print(f"\tCurrent File: {image_name}")
-        plt.savefig(image_path)
-        plt.close()
-
+        finalize_and_save_plot()
+        save_as()
         return (t_data, v_data)
 
     except KeyboardInterrupt:
-        plt.ioff()
-        fig.canvas.draw()
-        plt.show()
-        print(f"Saving {os.path.abspath(image_path)}")
-        print(f"\tCurrent File: {image_name}")
-        plt.savefig(image_path)
-        plt.close()
-
+        finalize_and_save_plot()
+        save_as()
         return (t_data, v_data)
     except Exception as e:
         print(f"Unknown error: {e}")
