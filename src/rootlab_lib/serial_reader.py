@@ -25,6 +25,7 @@ def gather_data(
     baudrate: str = 9600,
     output_dir: str = ".",
     mock: bool = False,
+    thresh: int = 40,
 ) -> Tuple[List[float], List[float]]:
     """
     Reads and plots serial data in real-time, and saves to a timestamped .txt file.
@@ -35,6 +36,7 @@ def gather_data(
         baudrate (int, optional): Baud rate for serial communication. Defaults to '9600'
         output_dir (str, optional): Directory to save the output file. Defaults to '.'
         mock (bool, optional): Indicates whether or not serial data should be simulated
+        thresh (int, optional): The number of readings gathered before the plot updates
 
     Returns:
         Tuple(List[float], List[float]): (time_series, voltage_series)
@@ -67,6 +69,8 @@ def gather_data(
         ax.set_ylabel("Voltage (V)")
         ax.set_title("Voltage vs. Time")
         ax.grid(True)
+        
+        num_readings = 0
 
         with open(text_path, "w") as f:
             while True:
@@ -80,14 +84,18 @@ def gather_data(
                     t_data.append(timestamp)
                     f.write(f"{timestamp},{voltage}\n")
 
-                    # Update plot every frame
-                    line.set_xdata(t_data)
-                    line.set_ydata(v_data)
-                    ax.relim()
-                    ax.autoscale_view()
-                    fig.canvas.draw()
+                    # Update plot every thresh readings
+                    if num_readings == thresh:
+                        line.set_xdata(t_data)
+                        line.set_ydata(v_data)
+                        ax.relim()
+                        ax.autoscale_view()
+                        fig.canvas.draw()
+                        num_readings = 0
+                    else:
+                        num_readings += 1
                     fig.canvas.flush_events()
-
+                        
                     # Make sure the plot hasn't been manually closed by the user
                     if not plt.fignum_exists(fig.number):
                         print("Plot window closed manually. Stopping...")
@@ -118,5 +126,5 @@ def gather_data(
         plt.close()
 
         return (t_data, v_data)
-    except serial.SerialException as e:
-        print(f"Serial connection error: {e}")
+    except Exception as e:
+        print(f"Unknown error: {e}")

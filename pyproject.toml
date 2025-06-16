@@ -4,7 +4,7 @@ packages = ["rootlab_lib"]
 
 [project]
 name = "rootlab_lib"
-version = "0.2.0"
+version = "0.2.1"
 description = "RootLab data analysis tools"
 readme = "README.md"
 authors = [
