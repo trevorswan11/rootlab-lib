@@ -113,7 +113,7 @@ def _plot_voltage_series_plateaus(
     print(f"\tCurrent File: {os.path.basename(output_file)}")
     plt.savefig(output_file)
     plt.show()
-    
+
     return v_avg
 
 
@@ -221,6 +221,7 @@ def heatmap(
     min_gap_length: float = RECOMMENDED_MIN_GAP_LENGTH,
     title: str = "Heatmap",
     prepend_zero: bool = False,
+    output_dir: str = ".",
     output_image_extension: str = "png",
 ) -> None:
     """Creates a heatmap out of given data
@@ -232,6 +233,7 @@ def heatmap(
         min_gap_length (float, optional): The minimum voltage drop to break a plateau. Defaults to 0.01
         title (str, optional): The title to use for the map. Defaults to 'Heatmap'.
         prepend_zero (bool, optional): Determines if the plateaus should have 0 added to the start of the list. Defaults to False.
+        output_dir (str, optional): The directory to save the image to. Defaults to '.', the current directory
         output_image_extension (str, optional): Specifies the image type to save the generated graph as. Do not include the dot. Defaults to png
     """
     v_averages = [
@@ -247,9 +249,8 @@ def heatmap(
         v_averages = [0] + v_averages
     print(f"{v_averages}\n Number of Plateaus: {len(v_averages)}")
     basename = os.path.basename(filepath)
-    output_file = os.path.join(
-        os.path.dirname(filepath), f"{os.path.splitext(basename)[0]}"
-    )
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, f"{os.path.splitext(basename)[0]}")
     _plot_voltage_heatmap(
         average_voltage_analysis(v_averages)[1],
         output_file,
@@ -266,6 +267,7 @@ def regression(
     title: str = "Regression Model",
     prepend_zero: bool = False,
     intercept: bool = False,
+    output_dir: str = ".",
     output_image_extension: str = "png",
 ) -> None:
     """Creates a linear regression out of given data
@@ -278,6 +280,7 @@ def regression(
         title (str, optional): The title to use for the plot. Defaults to 'Regression Model'.
         prepend_zero (bool, optional): Determines if the plateaus should have 0 added to the start of the list. Defaults to False.
         intercept (bool, optional): Determines if the y-intercept should be variable and not fixed at (0,0). Defaults to False.
+        output_dir (str, optional): The directory to save the image to. Defaults to '.', the current directory
         output_image_extension (str, optional): Specifies the image type to save the generated graph as. Do not include the dot. Defaults to png
     """
     data = read_timed_voltage_data(filepath)
@@ -291,9 +294,8 @@ def regression(
         v_averages = [0] + v_averages
     pos, _, V_avg_column, V_std_column = average_voltage_analysis(v_averages)
     basename = os.path.basename(filepath)
-    output_file = os.path.join(
-        os.path.dirname(filepath), f"{os.path.splitext(basename)[0]}"
-    )
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, f"{os.path.splitext(basename)[0]}")
     _plot_voltage_regression(
         pos,
         V_avg_column,
@@ -314,6 +316,8 @@ def series(
     title_plateaus: str = "Voltage Series with Plateaus",
     plateaus: bool = False,
     legend: bool = False,
+    output_series_dir: str = "./data/Series",
+    output_plats_dir: str = "./data/Plats",
     output_image_extension: str = "png",
 ) -> None:
     """Creates the voltage series out of given data
@@ -327,14 +331,17 @@ def series(
         title_plateaus (str, optional): The title to use for the map. Defaults to 'Voltage Series with Plateaus'.
         plateaus (bool, optional): Determines if the plateaus should be plotted on the graph. Defaults to False.
         legend (bool, optional): Determines whether or not to show the legend. Defaults to False for readability.
+        output_series_dir (str, optional): The directory to save the image to if the plateau flag is false. Defaults to '.', relative to the current directory
+        output_plats_dir (str, optional): The directory to save the image to if the plateau flag is true. Defaults to './data/Plats', relative to the current directory
         output_image_extension (str, optional): Specifies the image type to save the generated graph as. Do not include the dot. Defaults to png
     """
     data = read_timed_voltage_data(filepath)
     plats = find_plateaus(data[1], threshold, min_plateau_length, min_gap_length)
     basename = os.path.basename(filepath)
-    output_file = os.path.join(
-        os.path.dirname(filepath), f"{os.path.splitext(basename)[0]}"
-    )
+
+    output_dir = output_plats_dir if plateaus else output_series_dir
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, f"{os.path.splitext(basename)[0]}")
 
     if plateaus:
         _plot_voltage_series_plateaus(

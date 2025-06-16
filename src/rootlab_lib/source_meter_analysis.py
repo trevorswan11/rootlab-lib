@@ -2,6 +2,7 @@
 
 import pandas as pd
 from typing import Tuple, List
+import time as t
 import os
 import csv
 import matplotlib.pyplot as plt
@@ -9,7 +10,9 @@ import matplotlib.pyplot as plt
 
 def gather_data(
     input_filepath: str,
-    output_filepath: str,
+    output_name: str,
+    output_dir: str = '.',
+    output_image_ext: str = 'png',
     reading_column_name: str = "Reading",
     time_column_name: str = "Relative Time",
     title: str = "Source Meter Readings",
@@ -22,7 +25,9 @@ def gather_data(
 
     Args:
         input_filepath (str): The name of the input file with the data to be read. This should be a csv file.
-        output_filepath (str): Descriptive name used in output filename. This should be a .png file
+        output_name (str): Descriptive name used in output filename. The current date and time will be combined with this. Do not include the extension or path
+        output_dir (str, optional): The path to be used for the output image. Defaults to '.', the current directory
+        output_image_ext (str, optional): The image extension to be used for the output image. You need not include the period. Defaults to 'png'
         reading_column_name (str, optional): The name of the column in the data that holds the readings. Defaults to 'Reading'
         time_column_name (str, optional): The name of the column in the data that holds the time values. Defaults to 'Relative Time'
         title (str, optional): The title of the plot. Defaults to 'Source Meter Readings'
@@ -36,9 +41,10 @@ def gather_data(
     if not os.path.isfile(input_filepath):
         print("Error: Input filepath is not a valid file")
         return
-
-    output_directory = os.path.dirname(output_filepath)
-    os.makedirs(output_directory, exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
+    curr_date, curr_time = t.strftime("%y-%m-%d"), t.strftime("%H-%M-%S")
+    output_name = f"{curr_date}_{output_name}_{curr_time}.{output_image_ext}"
+    output = os.path.join(output_dir, output_name)
 
     # Initialize the row vectors to hold the differently sized data
     two_col_rows = []
@@ -89,9 +95,9 @@ def gather_data(
             plt.ylabel(f"Readings ({readings_unit})")
             plt.grid(True)
             plt.tight_layout()
-            plt.savefig(output_filepath)
-            print(f"Saving {os.path.abspath(output_filepath)}")
-            print(f"\tCurrent File: {os.path.basename(output_filepath)}")
+            plt.savefig(output)
+            print(f"Saving {os.path.abspath(output)}")
+            print(f"\tCurrent File: {os.path.basename(output)}")
             plt.show()
 
             return (time, readings)

@@ -6,7 +6,6 @@ import time
 import os
 from typing import List, Tuple
 import random
-from .voltage_analysis import _plot_voltage_series
 
 
 class _MockSerial:
@@ -24,7 +23,9 @@ def gather_data(
     port: str,
     name: str,
     baudrate: str = 9600,
-    output_dir: str = ".",
+    output_file_dir: str = ".",
+    output_image_dir: str = ".",
+    output_image_ext: str = "png",
     mock: bool = False,
     thresh: int = 20,
 ) -> Tuple[List[float], List[float]]:
@@ -33,9 +34,11 @@ def gather_data(
 
     Args:
         port (str): Serial port (e.g., 'COM3').
-        name (str): Descriptive name used in output filename. You meed not include the file extension
+        name (str): Descriptive name used in output filename. You need not include the file extension
         baudrate (int, optional): Baud rate for serial communication. Defaults to '9600'
-        output_dir (str, optional): Directory to save the output file. Defaults to '.'
+        output_file_dir (str, optional): Directory to save the output file. Defaults to '.', the current directory
+        output_image_dir (str, optional): Directory to save the output image. Defaults to '.', the current directory
+        output_image_dir (str, optional): Extension to use for the output image. You need not include the period. Defaults to 'png'
         mock (bool, optional): Indicates whether or not serial data should be simulated
         thresh (int, optional): The number of readings gathered before the plot updates
 
@@ -51,11 +54,13 @@ def gather_data(
         # Initialize the output file and its location location
         curr_date, curr_time = time.strftime("%y-%m-%d"), time.strftime("%H-%M-%S")
         name = f"{curr_date}_{name}_{curr_time}"
-        os.makedirs(output_dir, exist_ok=True)
+        os.makedirs(output_image_dir, exist_ok=True)
         text_name = f"{name}.txt"
-        text_path = os.path.join(output_dir, text_name)
-        image_name = f"{name}.png"
-        image_path = os.path.join(output_dir, image_name)
+        text_path = os.path.join(output_file_dir, text_name)
+        
+        os.makedirs(output_image_dir, exist_ok=True)
+        image_name = f"{name}.{output_image_ext}"
+        image_path = os.path.join(output_image_dir, image_name)
         print(f"Opening {os.path.abspath(text_path)}")
         print(f"\tCurrent File: {text_name}")
 
@@ -74,6 +79,7 @@ def gather_data(
         
         num_readings = 0
         
+        # Handles closing and saving the plot
         def finalize_and_save_plot():
             line.set_xdata(t_data)
             line.set_ydata(v_data)
@@ -87,6 +93,7 @@ def gather_data(
             plt.savefig(image_path)
             plt.close()
             
+        # If the program exists without updating the plot, it saves a white screen, this ensures the data is saved
         def save_as():
             plt.figure(figsize=(12, 6))
             plt.plot(t_data, v_data, label=title)

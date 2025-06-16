@@ -56,19 +56,18 @@ rootlab_lib    </h1>
 
 <h2 id="instructions">Instructions</h2>
 
+<h3 id="pip">Pip</h3>
+
 <p>With basic pip, use:</p>
 
 <pre><code>pip install rootlab-lib
 </code></pre>
 
-<p>If using Sypder (Conda is your package manager), use:</p>
+<h3 id="spyder">Spyder</h3>
 
-<pre><code>conda install conda-build
-conda skeleton pypi rootlab-lib
-conda build rootlab-lib
-</code></pre>
+<p>If using Spyder (Conda is your package manager or you do not have pip), you MUST download python <a href="https://www.python.org/downloads/">here</a> and change the interpreter for Spyder to the downloaded python version. When you download python using the link above, note the installation folder of the interpreter and copy it to your clipboard so that you can paste the path in Spyder. To change the path to the interpreter in Spyder, Select <code>Tools</code>, <code>Settings</code>, then <code>Python Interpreter</code>. At the top of this page, check the box that allows you to enter a custom interpreter, paste the path you copied earlier. Restart Spyder, and enter the command it tells you to use to fix any issues with the new interpreter. It should be something like <code>pip install spyder-kernels</code>. You can now run <code>pip install rootlab-lib</code> without issue. You may need to restart Spyder again for the changes to take effect.</p>
 
-<p>This should work, but I need to look into the effectiveness of this, and may upload the package to conda-forge if needed!</p>
+<p>If you already have python installed, then you must find out where your python interpreter is located on your system. This can be down by opening a terminal and typing <code>where python</code>. You can also just google it if this doesn't work!</p>
 </div>
 
                         <input id="mod-rootlab_lib-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
@@ -80,23 +79,22 @@ conda build rootlab-lib
 </span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="sd">A library of data analysis tools for the RootLab at CWRU. This library contains functions commonly used for data analysis in the lab. For obvious reasons, data used for the modules tests is not be shared.</span>
 </span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a>
 </span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="sd">## Instructions</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="sd">With basic pip, use:</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">```</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="sd">pip install rootlab-lib</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="sd">```</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="sd">If using Sypder (Conda is your package manager), use:</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="sd">```</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="sd">conda install conda-build</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="sd">conda skeleton pypi rootlab-lib</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="sd">conda build rootlab-lib</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">```</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="sd">This should work, but I need to look into the effectiveness of this, and may upload the package to conda-forge if needed!</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="kn">from</span> <span class="nn">.serial_reader</span> <span class="kn">import</span> <span class="o">*</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="kn">from</span> <span class="nn">.voltage_analysis</span> <span class="kn">import</span> <span class="o">*</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="kn">from</span> <span class="nn">.plateau_processing</span> <span class="kn">import</span> <span class="o">*</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="kn">from</span> <span class="nn">.source_meter_analysis</span> <span class="kn">import</span> <span class="o">*</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="sd">### Pip</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">With basic pip, use:</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="sd">```</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="sd">pip install rootlab-lib</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="sd">```</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="sd">### Spyder</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="sd">If using Spyder (Conda is your package manager or you do not have pip), you MUST download python [here](https://www.python.org/downloads/) and change the interpreter for Spyder to the downloaded python version. When you download python using the link above, note the installation folder of the interpreter and copy it to your clipboard so that you can paste the path in Spyder. To change the path to the interpreter in Spyder, Select `Tools`, `Settings`, then `Python Interpreter`. At the top of this page, check the box that allows you to enter a custom interpreter, paste the path you copied earlier. Restart Spyder, and enter the command it tells you to use to fix any issues with the new interpreter. It should be something like `pip install spyder-kernels`. You can now run `pip install rootlab-lib` without issue. You may need to restart Spyder again for the changes to take effect.</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">If you already have python installed, then you must find out where your python interpreter is located on your system. This can be down by opening a terminal and typing `where python`. You can also just google it if this doesn&#39;t work!</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="kn">from</span> <span class="nn">.serial_reader</span> <span class="kn">import</span> <span class="o">*</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="kn">from</span> <span class="nn">.voltage_analysis</span> <span class="kn">import</span> <span class="o">*</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="kn">from</span> <span class="nn">.plateau_processing</span> <span class="kn">import</span> <span class="o">*</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="kn">from</span> <span class="nn">.source_meter_analysis</span> <span class="kn">import</span> <span class="o">*</span>
 </span></pre></div>
 
 

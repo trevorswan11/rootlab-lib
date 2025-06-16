@@ -186,3 +186,4 @@ build.bat
 update.bat
 gendocs.bat
 .env
+data
