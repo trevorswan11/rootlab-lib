@@ -38,7 +38,7 @@ def _plot_voltage_series(
     Returns:
         List[float]: The list of the extracted average values from each plateau
     """
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(12, 9))
     plt.plot(time_data, voltage_data, label=title)
     plt.title(title, fontsize=25)
     plt.grid(True)
@@ -76,7 +76,7 @@ def _plot_voltage_series_plateaus(
         List[float]: The list of the extracted average values from each plateau
     """
     # plot the original series
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(12, 9))
     plt.plot(time_data, voltage_data, label=title, color="blue")
 
     # plot each plateau as a scatter, including the average at the average time

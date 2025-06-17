@@ -69,7 +69,7 @@ def gather_data(
 
         # Initialize the plot for real time plotting
         plt.ion()
-        fig, ax = plt.subplots(figsize=(8, 6))
+        fig, ax = plt.subplots(figsize=(12, 9))
         (line,) = ax.plot([], [], color="blue")
         ax.set_xlabel("Time (s)")
         ax.set_ylabel("Voltage (V)")
@@ -95,7 +95,7 @@ def gather_data(
             
         # If the program exists without updating the plot, it saves a white screen, this ensures the data is saved
         def save_as():
-            plt.figure(figsize=(12, 6))
+            plt.figure(figsize=(12, 9))
             plt.plot(t_data, v_data, label=title)
             plt.title(title, fontsize=25)
             plt.grid(True)
