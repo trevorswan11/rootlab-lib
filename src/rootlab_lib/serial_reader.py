@@ -23,12 +23,12 @@ def gather_data(
     port: str,
     name: str,
     baudrate: str = 9600,
-    output_file_dir: str = ".",
-    output_image_dir: str = ".",
+    output_file_dir: str = "./data/Raw",
+    output_image_dir: str = "./data/Series",
     output_image_ext: str = "png",
     mock: bool = False,
     thresh: int = 20,
-) -> Tuple[List[float], List[float]]:
+) -> Tuple[List[float], List[float], str]:
     """
     Reads and plots serial data in real-time, and saves to a timestamped .txt file.
 
@@ -43,7 +43,7 @@ def gather_data(
         thresh (int, optional): The number of readings gathered before the plot updates
 
     Returns:
-        Tuple(List[float], List[float]): (time_series, voltage_series)
+        Tuple(List[float], List[float], str): (time_series, voltage_series, output_file_path)
     """
     try:
         # Create the instance and set the port to the users request
@@ -54,7 +54,7 @@ def gather_data(
         # Initialize the output file and its location location
         curr_date, curr_time = time.strftime("%y-%m-%d"), time.strftime("%H-%M-%S")
         name = f"{curr_date}_{name}_{curr_time}"
-        os.makedirs(output_image_dir, exist_ok=True)
+        os.makedirs(output_file_dir, exist_ok=True)
         text_name = f"{name}.txt"
         text_path = os.path.join(output_file_dir, text_name)
         
@@ -140,11 +140,11 @@ def gather_data(
 
         finalize_and_save_plot()
         save_as()
-        return (t_data, v_data)
+        return (t_data, v_data, text_path)
 
     except KeyboardInterrupt:
         finalize_and_save_plot()
         save_as()
-        return (t_data, v_data)
+        return (t_data, v_data, text_path)
     except Exception as e:
         print(f"Unknown error: {e}")
