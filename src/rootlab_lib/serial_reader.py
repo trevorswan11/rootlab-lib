@@ -88,6 +88,7 @@ def gather_data(
             fig.canvas.draw()
             fig.canvas.flush_events()
             plt.ioff()
+            plt.tight_layout()
             print(f"Saving {os.path.abspath(image_path)}")
             print(f"\tCurrent File: {image_name}")
             plt.savefig(image_path)
@@ -102,6 +103,7 @@ def gather_data(
             plt.xlabel("Time (s)", fontsize=25)
             plt.ylabel("Voltage (V)", fontsize=25)
             plt.tick_params(labelsize=25, width=2, length=7)
+            plt.tight_layout()
             plt.savefig(image_path)
             plt.close()
 

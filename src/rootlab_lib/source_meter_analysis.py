@@ -8,7 +8,7 @@ import csv
 import matplotlib.pyplot as plt
 
 
-def gather_data(
+def analyze(
     input_filepath: str,
     output_name: str,
     output_dir: str = '.',
@@ -19,7 +19,7 @@ def gather_data(
     readings_unit: str = "Ohms",
     time_unit: str = "seconds",
     offset: float = 0,
-) -> Tuple[List[float], List[float]]:
+) -> Tuple[List[float], List[float], str]:
     """
     Writes and plots source meter resistance readings vs time and saves a .png of the data.
 
@@ -35,16 +35,19 @@ def gather_data(
         time_unit (str, optional): The unit of the time values reported. Defaults to seconds
         offset (float, optional): The offset to add to the readings to account for the source meters data truncation for repetitive values. Defaults to 0
     Returns:
-        Tuple(List[float], List[float]): (time_series, resistance_series)
+        Tuple(List[float], List[float], str): (time_series, resistance_series, data_filepath_out) where data_filepath_out is a txt file of [time, data]
     """
     # Prep the file system for reading and writing
     if not os.path.isfile(input_filepath):
         print("Error: Input filepath is not a valid file")
         return
     os.makedirs(output_dir, exist_ok=True)
-    curr_date, curr_time = t.strftime("%y-%m-%d"), t.strftime("%H-%M-%S")
-    output_name = f"{curr_date}_{output_name}_{curr_time}.{output_image_ext}"
-    output = os.path.join(output_dir, output_name)
+    curr_date, curr_time = t.strftime("%y-%m-%d"), t.strftime("%H-%M-%S") 
+    output_img = f"{curr_date}_{output_name}_{curr_time}.{output_image_ext}"
+    output_img_path = os.path.join(output_dir, output_img)
+    
+    output_data = f"{curr_date}_{output_name}_{curr_time}.txt"
+    output_data_path = os.path.join(output_dir, output_data)
 
     # Initialize the row vectors to hold the differently sized data
     two_col_rows = []
@@ -61,7 +64,11 @@ def gather_data(
                 else:
                     switch_found = True
                     rest_rows.append(row)
-
+        except Exception as e:
+            print(f"Fatal error reading input csv file: {e}")
+            return
+        
+        try:
             # Create pandas dataframes out of the two vectors for processing
             headers_2col = two_col_rows[0]
             headers_21col = rest_rows[0]
@@ -87,6 +94,13 @@ def gather_data(
             # Extract lists and apply offset
             readings = (df2[reading_column_name] + offset).tolist()
             time = df2[time_column_name].tolist()
+            
+            with open(output_data_path, 'w') as f:
+                if (len(readings) != len(time)):
+                    raise ValueError("Cleaned readings and time vectors are unequal in length!")
+                print(f"Saving {os.path.abspath(output_data_path)}")
+                for i in range(len(readings)):
+                    f.write(f"{time[i]},{readings[i]}\n")
 
             plt.figure(figsize=(10, 6))
             plt.plot(time, readings, linestyle="-", color="blue")
@@ -95,13 +109,13 @@ def gather_data(
             plt.ylabel(f"Readings ({readings_unit})")
             plt.grid(True)
             plt.tight_layout()
-            plt.savefig(output)
-            print(f"Saving {os.path.abspath(output)}")
-            print(f"\tCurrent File: {os.path.basename(output)}")
+            plt.savefig(output_img_path)
+            print(f"Saving {os.path.abspath(output_img_path)}")
+            print(f"\tCurrent File: {os.path.basename(output_img_path)}")
             plt.show()
 
-            return (time, readings)
+            return (time, readings, output_data_path)
 
         except Exception as e:
-            print(f"Fatal error reading input csv file: {e}")
+            print(f"Fatal error plotting input data: {e}")
             return

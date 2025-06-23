@@ -13,7 +13,7 @@ min_gap_length = voltage_analysis.RECOMMENDED_MIN_GAP_LENGTH
 
 # Tests the 
 def test_plot_suite():
-    filepath = '../test_files/data1.txt'
+    filepath = '../test_data/data1.txt'
     out_dir = '../test_files/'
     
     voltage_analysis.series(filepath, output_plats_dir=out_dir, output_series_dir=out_dir, title_default='Test Data', title_plateaus='Test Data')

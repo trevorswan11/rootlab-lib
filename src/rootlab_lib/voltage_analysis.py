@@ -45,6 +45,7 @@ def _plot_voltage_series(
     plt.xlabel("Time (s)", fontsize=25)
     plt.ylabel("Voltage (V)", fontsize=25)
     plt.tick_params(labelsize=25, width=2, length=7)
+    plt.tight_layout()
     output_file = f"{output_file}_SERIES.{output_file_extension}"
     print(f"Saving {os.path.abspath(output_file)}")
     print(f"\tCurrent File: {os.path.basename(output_file)}")
@@ -101,11 +102,12 @@ def _plot_voltage_series_plateaus(
     # format the plot for readers convenience
     plt.title("Voltage Series with Plateaus")
     plt.grid(True)
-    plt.xlabel("Increment", fontsize=25)
+    plt.xlabel("Time (s)", fontsize=25)
     plt.ylabel("Voltage", fontsize=25)
     plt.tick_params(labelsize=25, width=2, length=7)
     if legend:
         plt.legend()
+    plt.tight_layout()
 
     # show the plot and return the average voltages
     output_file = f"{output_file}_SERIES-plats.{output_file_extension}"
@@ -200,6 +202,7 @@ def _plot_voltage_regression(
             label="V = %.2f x\nR$^2$= %.4f" % (slope, r2),
         )
     plt.legend(loc="upper left", frameon=False, fontsize=20)
+    plt.tight_layout()
     output_file = (
         f"{output_file}_REGRESSION-intercept.{output_file_extension}"
         if intercept

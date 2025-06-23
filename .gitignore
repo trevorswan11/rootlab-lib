@@ -181,6 +181,7 @@ cython_debug/
 .cursorindexingignore
 
 # MISC
+test_data/
 test_files/
 build.bat
 update.bat

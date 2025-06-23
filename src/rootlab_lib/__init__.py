@@ -19,3 +19,4 @@ from .serial_reader import *
 from .voltage_analysis import *
 from .plateau_processing import *
 from .source_meter_analysis import *
+from .vkx150_analysis import *
