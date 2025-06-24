@@ -57,7 +57,7 @@ def gather_data(
         os.makedirs(output_file_dir, exist_ok=True)
         text_name = f"{name}.txt"
         text_path = os.path.join(output_file_dir, text_name)
-        
+
         os.makedirs(output_image_dir, exist_ok=True)
         image_name = f"{name}.{output_image_ext}"
         image_path = os.path.join(output_image_dir, image_name)
@@ -76,9 +76,9 @@ def gather_data(
         title = "Voltage vs. Time"
         ax.set_title(title)
         ax.grid(True)
-        
+
         num_readings = 0
-        
+
         # Handles closing and saving the plot
         def finalize_and_save_plot():
             line.set_xdata(t_data)
@@ -93,7 +93,7 @@ def gather_data(
             print(f"\tCurrent File: {image_name}")
             plt.savefig(image_path)
             plt.close()
-            
+
         # If the program exists without updating the plot, it saves a white screen, this ensures the data is saved
         def save_as():
             plt.figure(figsize=(12, 9))
@@ -130,7 +130,7 @@ def gather_data(
                     else:
                         num_readings += 1
                     fig.canvas.flush_events()
-                        
+
                     # Make sure the plot hasn't been manually closed by the user
                     if not plt.fignum_exists(fig.number):
                         print("Plot window closed manually. Stopping...")

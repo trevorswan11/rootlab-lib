@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt
 def analyze(
     input_filepath: str,
     output_name: str,
-    output_dir: str = '.',
-    output_image_ext: str = 'png',
+    output_dir: str = ".",
+    output_image_ext: str = "png",
     reading_column_name: str = "Reading",
     time_column_name: str = "Relative Time",
     title: str = "Source Meter Readings",
@@ -42,10 +42,10 @@ def analyze(
         print("Error: Input filepath is not a valid file")
         return
     os.makedirs(output_dir, exist_ok=True)
-    curr_date, curr_time = t.strftime("%y-%m-%d"), t.strftime("%H-%M-%S") 
+    curr_date, curr_time = t.strftime("%y-%m-%d"), t.strftime("%H-%M-%S")
     output_img = f"{curr_date}_{output_name}_{curr_time}.{output_image_ext}"
     output_img_path = os.path.join(output_dir, output_img)
-    
+
     output_data = f"{curr_date}_{output_name}_{curr_time}.txt"
     output_data_path = os.path.join(output_dir, output_data)
 
@@ -67,7 +67,7 @@ def analyze(
         except Exception as e:
             print(f"Fatal error reading input csv file: {e}")
             return
-        
+
         try:
             # Create pandas dataframes out of the two vectors for processing
             headers_2col = two_col_rows[0]
@@ -94,10 +94,12 @@ def analyze(
             # Extract lists and apply offset
             readings = (df2[reading_column_name] + offset).tolist()
             time = df2[time_column_name].tolist()
-            
-            with open(output_data_path, 'w') as f:
-                if (len(readings) != len(time)):
-                    raise ValueError("Cleaned readings and time vectors are unequal in length!")
+
+            with open(output_data_path, "w") as f:
+                if len(readings) != len(time):
+                    raise ValueError(
+                        "Cleaned readings and time vectors are unequal in length!"
+                    )
                 print(f"Saving {os.path.abspath(output_data_path)}")
                 for i in range(len(readings)):
                     f.write(f"{time[i]},{readings[i]}\n")
