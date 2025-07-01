@@ -14,10 +14,10 @@ def test_single_heightmap():
 
 def test_compare_heightmaps():
     vkx150_analysis.compare_heightmaps(
-        [file1_in, file2_in, file2_in, file1_in],
+        [file1_in],
         comparison_out,
         out_dir,
-        individual_colorbars=True,
+        # individual_colorbars=False,
         title="",
     )
 

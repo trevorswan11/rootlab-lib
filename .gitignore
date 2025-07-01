@@ -183,6 +183,7 @@ cython_debug/
 # MISC
 test_data/
 test_files/
+translate/
 build.bat
 update.bat
 gendocs.bat
