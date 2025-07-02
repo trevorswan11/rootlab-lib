@@ -14,7 +14,7 @@ class _MockSerial:
 
     def readline(self):
         time.sleep(self.delay)
-        return f"{random.uniform(0, 5):.3f}\n".encode()
+        return f"{random.uniform(4000, 50000):.3f},{random.uniform(4000, 50000):.3f},{random.uniform(4000, 50000):.3f}\n".encode()
 
 
 def gather_data(
@@ -41,9 +41,9 @@ def gather_data(
         thresh (int, optional): The number of readings gathered before the plot updates
 
     Returns:
-        Tuple(List[float], List[float], str): (time_series, voltage_series, output_file_path)
+        Tuple(List[float], List[float], List[float], List[float], str): (R1_series, R2_series, R3_series, time_series, output_file_path)
     """
-    ser = _MockSerial(0.1) if mock else serial.Serial(port=port, baudrate=baudrate)
+    ser = _MockSerial(0.001) if mock else serial.Serial(port=port, baudrate=baudrate)
     curr_date, curr_time = time.strftime("%y-%m-%d"), time.strftime("%H-%M-%S")
     base_name = f"{curr_date}_{name}_{curr_time}"
 
@@ -58,7 +58,6 @@ def gather_data(
     t0 = time.time()
 
     fig, ax = plt.subplots(figsize=(12, 9))
-    ax.set_ylim(1000, 50000)
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Resistance (Ohm)")
     ax.set_title("Resistance vs. Time")
@@ -98,12 +97,12 @@ def gather_data(
             line2.set_data(t_trim, R2_trim)
             line3.set_data(t_trim, R3_trim)
 
-            ax.relim()
-            ax.autoscale_view()
+            y_max = max(max(R1_trim, default=0), max(R2_trim, default=0), max(R3_trim, default=0))
+            ax.set_ylim(0, y_max * 1.1 if y_max > 0 else 1)
         except Exception as e:
             print(f"Error in update: {e}")
 
-    ani = animation.FuncAnimation(fig, update, interval=50, cache_frame_data=False)
+    ani = animation.FuncAnimation(fig, update, interval=50, cache_frame_data=False, blit=False)
     plt.tight_layout()
 
     try:
@@ -115,4 +114,4 @@ def gather_data(
     f.close()
     fig.savefig(image_path)
     print(f"Plot saved to {image_path}")
-    return R1, R2, R3, t, text_path
+    return R1, R2, R3, t, ani, text_path
