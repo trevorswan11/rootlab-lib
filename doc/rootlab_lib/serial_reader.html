@@ -101,7 +101,7 @@
 </span><span id="L-43"><a href="#L-43"><span class="linenos"> 43</span></a><span class="sd">        thresh (int, optional): The number of readings gathered before the plot updates</span>
 </span><span id="L-44"><a href="#L-44"><span class="linenos"> 44</span></a>
 </span><span id="L-45"><a href="#L-45"><span class="linenos"> 45</span></a><span class="sd">    Returns:</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="sd">        Tuple(List[float], List[float], str): (time_series, voltage_series, output_file_path)</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos"> 46</span></a><span class="sd">        Tuple(List[float], List[float], str): (voltage_series, time_series, output_file_path)</span>
 </span><span id="L-47"><a href="#L-47"><span class="linenos"> 47</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="L-48"><a href="#L-48"><span class="linenos"> 48</span></a>    <span class="k">try</span><span class="p">:</span>
 </span><span id="L-49"><a href="#L-49"><span class="linenos"> 49</span></a>        <span class="c1"># Create the instance and set the port to the users request</span>
@@ -200,12 +200,12 @@
 </span><span id="L-142"><a href="#L-142"><span class="linenos">142</span></a>
 </span><span id="L-143"><a href="#L-143"><span class="linenos">143</span></a>        <span class="n">finalize_and_save_plot</span><span class="p">()</span>
 </span><span id="L-144"><a href="#L-144"><span class="linenos">144</span></a>        <span class="n">save_as</span><span class="p">()</span>
-</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>        <span class="k">return</span> <span class="p">(</span><span class="n">t_data</span><span class="p">,</span> <span class="n">v_data</span><span class="p">,</span> <span class="n">text_path</span><span class="p">)</span>
+</span><span id="L-145"><a href="#L-145"><span class="linenos">145</span></a>        <span class="k">return</span> <span class="p">(</span><span class="n">v_data</span><span class="p">,</span> <span class="n">t_data</span><span class="p">,</span> <span class="n">text_path</span><span class="p">)</span>
 </span><span id="L-146"><a href="#L-146"><span class="linenos">146</span></a>
 </span><span id="L-147"><a href="#L-147"><span class="linenos">147</span></a>    <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
 </span><span id="L-148"><a href="#L-148"><span class="linenos">148</span></a>        <span class="n">finalize_and_save_plot</span><span class="p">()</span>
 </span><span id="L-149"><a href="#L-149"><span class="linenos">149</span></a>        <span class="n">save_as</span><span class="p">()</span>
-</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>        <span class="k">return</span> <span class="p">(</span><span class="n">t_data</span><span class="p">,</span> <span class="n">v_data</span><span class="p">,</span> <span class="n">text_path</span><span class="p">)</span>
+</span><span id="L-150"><a href="#L-150"><span class="linenos">150</span></a>        <span class="k">return</span> <span class="p">(</span><span class="n">v_data</span><span class="p">,</span> <span class="n">t_data</span><span class="p">,</span> <span class="n">text_path</span><span class="p">)</span>
 </span><span id="L-151"><a href="#L-151"><span class="linenos">151</span></a>    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
 </span><span id="L-152"><a href="#L-152"><span class="linenos">152</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span></pre></div>
@@ -247,7 +247,7 @@
 </span><span id="gather_data-44"><a href="#gather_data-44"><span class="linenos"> 44</span></a><span class="sd">        thresh (int, optional): The number of readings gathered before the plot updates</span>
 </span><span id="gather_data-45"><a href="#gather_data-45"><span class="linenos"> 45</span></a>
 </span><span id="gather_data-46"><a href="#gather_data-46"><span class="linenos"> 46</span></a><span class="sd">    Returns:</span>
-</span><span id="gather_data-47"><a href="#gather_data-47"><span class="linenos"> 47</span></a><span class="sd">        Tuple(List[float], List[float], str): (time_series, voltage_series, output_file_path)</span>
+</span><span id="gather_data-47"><a href="#gather_data-47"><span class="linenos"> 47</span></a><span class="sd">        Tuple(List[float], List[float], str): (voltage_series, time_series, output_file_path)</span>
 </span><span id="gather_data-48"><a href="#gather_data-48"><span class="linenos"> 48</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="gather_data-49"><a href="#gather_data-49"><span class="linenos"> 49</span></a>    <span class="k">try</span><span class="p">:</span>
 </span><span id="gather_data-50"><a href="#gather_data-50"><span class="linenos"> 50</span></a>        <span class="c1"># Create the instance and set the port to the users request</span>
@@ -346,12 +346,12 @@
 </span><span id="gather_data-143"><a href="#gather_data-143"><span class="linenos">143</span></a>
 </span><span id="gather_data-144"><a href="#gather_data-144"><span class="linenos">144</span></a>        <span class="n">finalize_and_save_plot</span><span class="p">()</span>
 </span><span id="gather_data-145"><a href="#gather_data-145"><span class="linenos">145</span></a>        <span class="n">save_as</span><span class="p">()</span>
-</span><span id="gather_data-146"><a href="#gather_data-146"><span class="linenos">146</span></a>        <span class="k">return</span> <span class="p">(</span><span class="n">t_data</span><span class="p">,</span> <span class="n">v_data</span><span class="p">,</span> <span class="n">text_path</span><span class="p">)</span>
+</span><span id="gather_data-146"><a href="#gather_data-146"><span class="linenos">146</span></a>        <span class="k">return</span> <span class="p">(</span><span class="n">v_data</span><span class="p">,</span> <span class="n">t_data</span><span class="p">,</span> <span class="n">text_path</span><span class="p">)</span>
 </span><span id="gather_data-147"><a href="#gather_data-147"><span class="linenos">147</span></a>
 </span><span id="gather_data-148"><a href="#gather_data-148"><span class="linenos">148</span></a>    <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
 </span><span id="gather_data-149"><a href="#gather_data-149"><span class="linenos">149</span></a>        <span class="n">finalize_and_save_plot</span><span class="p">()</span>
 </span><span id="gather_data-150"><a href="#gather_data-150"><span class="linenos">150</span></a>        <span class="n">save_as</span><span class="p">()</span>
-</span><span id="gather_data-151"><a href="#gather_data-151"><span class="linenos">151</span></a>        <span class="k">return</span> <span class="p">(</span><span class="n">t_data</span><span class="p">,</span> <span class="n">v_data</span><span class="p">,</span> <span class="n">text_path</span><span class="p">)</span>
+</span><span id="gather_data-151"><a href="#gather_data-151"><span class="linenos">151</span></a>        <span class="k">return</span> <span class="p">(</span><span class="n">v_data</span><span class="p">,</span> <span class="n">t_data</span><span class="p">,</span> <span class="n">text_path</span><span class="p">)</span>
 </span><span id="gather_data-152"><a href="#gather_data-152"><span class="linenos">152</span></a>    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
 </span><span id="gather_data-153"><a href="#gather_data-153"><span class="linenos">153</span></a>        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </span></pre></div>
@@ -370,7 +370,7 @@
     thresh (int, optional): The number of readings gathered before the plot updates</p>
 
 <p>Returns:
-    Tuple(List[float], List[float], str): (time_series, voltage_series, output_file_path)</p>
+    Tuple(List[float], List[float], str): (voltage_series, time_series, output_file_path)</p>
 </div>
 
 

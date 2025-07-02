@@ -25,7 +25,10 @@ def gather_data(
     output_image_dir: str = "./data/Multilayer-Series",
     output_image_ext: str = "png",
     mock: bool = False,
-    reference: float = None,
+    relative: float = None,
+    title: str = "Resistance vs. Time",
+    time_unit: str = "s",
+    resistance_unit: str = "Ohm",
     thresh: int = 1000,
 ) -> Tuple[List[float], List[float], str]:
     """
@@ -40,6 +43,9 @@ def gather_data(
         output_image_dir (str, optional): Extension to use for the output image. You need not include the period. Defaults to 'png'
         mock (bool, optional): Indicates whether or not serial data should be simulated
         relative (float, optional): Indicates whether to plot read resistance or relative resistance (read / reference value). Defaults to None
+        title (str): The title to use for the plot
+        time_unit (str, optional): The unit to use for the x-axis. This will be formatted as "Time ({time_unit})". Defaults to "s"
+        resistance_unit (str, optional): The unit to use for the y-axis. This will be formatted as "Resistance ({resistance_unit})". Defaults to "Ohm"
         thresh (int, optional): The number of readings gathered before the plot updates
 
     Returns:
@@ -61,9 +67,9 @@ def gather_data(
 
     fig, ax = plt.subplots(figsize=(12, 9))
     # ax.set_ylim(1000, 50000)
-    ax.set_xlabel("Time (s)")
-    ax.set_ylabel("Resistance (Ohm)")
-    ax.set_title("Resistance vs. Time")
+    ax.set_xlabel(f"Time ({time_unit})")
+    ax.set_ylabel(f"Resistance ({resistance_unit})")
+    ax.set_title(title)
     ax.grid(True)
 
     line1, = ax.plot([], [], label="Bottom")
@@ -97,10 +103,10 @@ def gather_data(
             t_trim = t[-thresh:]
             
             # Bring values into reference resistance range
-            if reference is not None:
-                R1_trim = [res1 / reference for res1 in R1_trim] 
-                R2_trim = [res2 / reference for res2 in R2_trim] 
-                R3_trim = [res3 / reference for res3 in R3_trim] 
+            if relative is not None:
+                R1_trim = [res1 / relative for res1 in R1_trim] 
+                R2_trim = [res2 / relative for res2 in R2_trim] 
+                R3_trim = [res3 / relative for res3 in R3_trim] 
 
             line1.set_data(t_trim, R1_trim)
             line2.set_data(t_trim, R2_trim)
@@ -129,6 +135,8 @@ def plot(
     file: str,
     output_file: str,
     title: str,
+    time_unit: str = "s",
+    resistance_unit: str = "Ohm",
     output_file_extension: str = "png",
 ) -> None:
     """Creates a plot of the voltage data against time. Overwrites any plot or file of the same name. Only use for recovery.
@@ -137,6 +145,8 @@ def plot(
         file (str): The file with raw data formatted as {r1},{r2},{r3},{time}, where r1 is the top and r3 is the bottom
         output_file (str): The output file to save the plot to. You need not specify the file extension
         title (str): The title to use for the plot
+        time_unit (str, optional): The unit to use for the x-axis. This will be formatted as "Time ({time_unit})". Defaults to "s"
+        resistance_unit (str, optional): The unit to use for the y-axis. This will be formatted as "Resistance ({resistance_unit})". Defaults to "Ohm"
         output_file_extension (str, optional): The file extension to use with the output file. Do not include the period. Defaults to "png"
 
     Returns:
@@ -170,8 +180,8 @@ def plot(
 
     plt.title(title, fontsize=25)
     plt.grid(True)
-    plt.xlabel("Time (s)", fontsize=25)
-    plt.ylabel("Resistance (Ohm)", fontsize=25)
+    plt.xlabel(f"Time ({time_unit})", fontsize=25)
+    plt.ylabel(f"Resistance ({resistance_unit})", fontsize=25)
     plt.tick_params(labelsize=20)
     plt.legend(fontsize=20)
     plt.tight_layout()
