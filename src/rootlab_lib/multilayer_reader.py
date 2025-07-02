@@ -224,14 +224,7 @@ def analyze(
                     resistance_top.append(r1)
                     resistance_middle.append(r2)
                     resistance_bottom.append(r3)
-                elif len(parts) == 4:
-                    r1 = float(parts[0])
-                    r2 = float(parts[1])
-                    r3 = float(parts[2])
-                    resistance_top.append(r1)
-                    resistance_middle.append(r2)
-                    resistance_bottom.append(r3)
-            except ValueError:
+            except Exception:
                 continue  # Skip lines that fail to parse
 
     with open(output_file, "w") as f:
