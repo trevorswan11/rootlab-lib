@@ -43,7 +43,7 @@ def gather_data(
         thresh (int, optional): The number of readings gathered before the plot updates
 
     Returns:
-        Tuple(List[float], List[float], str): (time_series, voltage_series, output_file_path)
+        Tuple(List[float], List[float], str): (voltage_series, time_series, output_file_path)
     """
     try:
         # Create the instance and set the port to the users request
@@ -142,11 +142,11 @@ def gather_data(
 
         finalize_and_save_plot()
         save_as()
-        return (t_data, v_data, text_path)
+        return (v_data, t_data, text_path)
 
     except KeyboardInterrupt:
         finalize_and_save_plot()
         save_as()
-        return (t_data, v_data, text_path)
+        return (v_data, t_data, text_path)
     except Exception as e:
         print(f"Unknown error: {e}")

@@ -14,7 +14,7 @@ class _MockSerial:
 
     def readline(self):
         time.sleep(self.delay)
-        return f"{random.uniform(4000, 50000):.3f},{random.uniform(4000, 50000):.3f},{random.uniform(4000, 50000):.3f}\n".encode()
+        return f"{random.uniform(0, 5):.3f}\n".encode()
 
 
 def gather_data(
@@ -25,6 +25,7 @@ def gather_data(
     output_image_dir: str = "./data/Multilayer-Series",
     output_image_ext: str = "png",
     mock: bool = False,
+    reference: float = None,
     thresh: int = 1000,
 ) -> Tuple[List[float], List[float], str]:
     """
@@ -38,12 +39,13 @@ def gather_data(
         output_image_dir (str, optional): Directory to save the output image. Defaults to '.', the current directory
         output_image_dir (str, optional): Extension to use for the output image. You need not include the period. Defaults to 'png'
         mock (bool, optional): Indicates whether or not serial data should be simulated
+        relative (float, optional): Indicates whether to plot read resistance or relative resistance (read / reference value). Defaults to None
         thresh (int, optional): The number of readings gathered before the plot updates
 
     Returns:
         Tuple(List[float], List[float], List[float], List[float], str): (R1_series, R2_series, R3_series, time_series, output_file_path)
     """
-    ser = _MockSerial(0.001) if mock else serial.Serial(port=port, baudrate=baudrate)
+    ser = _MockSerial(0.1) if mock else serial.Serial(port=port, baudrate=baudrate)
     curr_date, curr_time = time.strftime("%y-%m-%d"), time.strftime("%H-%M-%S")
     base_name = f"{curr_date}_{name}_{curr_time}"
 
@@ -58,6 +60,7 @@ def gather_data(
     t0 = time.time()
 
     fig, ax = plt.subplots(figsize=(12, 9))
+    # ax.set_ylim(1000, 50000)
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("Resistance (Ohm)")
     ax.set_title("Resistance vs. Time")
@@ -92,17 +95,23 @@ def gather_data(
             R2_trim = R2[-thresh:]
             R3_trim = R3[-thresh:]
             t_trim = t[-thresh:]
+            
+            # Bring values into reference resistance range
+            if reference is not None:
+                R1_trim = [res1 / reference for res1 in R1_trim] 
+                R2_trim = [res2 / reference for res2 in R2_trim] 
+                R3_trim = [res3 / reference for res3 in R3_trim] 
 
             line1.set_data(t_trim, R1_trim)
             line2.set_data(t_trim, R2_trim)
             line3.set_data(t_trim, R3_trim)
 
-            y_max = max(max(R1_trim, default=0), max(R2_trim, default=0), max(R3_trim, default=0))
-            ax.set_ylim(0, y_max * 1.1 if y_max > 0 else 1)
+            ax.relim()
+            ax.autoscale_view()
         except Exception as e:
             print(f"Error in update: {e}")
 
-    ani = animation.FuncAnimation(fig, update, interval=50, cache_frame_data=False, blit=False)
+    ani = animation.FuncAnimation(fig, update, interval=50, cache_frame_data=False)
     plt.tight_layout()
 
     try:
@@ -114,4 +123,70 @@ def gather_data(
     f.close()
     fig.savefig(image_path)
     print(f"Plot saved to {image_path}")
-    return R1, R2, R3, t, ani, text_path
+    return R1, R2, R3, t, text_path
+
+def plot(
+    file: str,
+    output_file: str,
+    title: str,
+    output_file_extension: str = "png",
+) -> None:
+    """Creates a plot of the voltage data against time. Overwrites any plot or file of the same name. Only use for recovery.
+
+    Args:
+        file (str): The file with raw data formatted as {r1},{r2},{r3},{time}, where r1 is the top and r3 is the bottom
+        output_file (str): The output file to save the plot to. You need not specify the file extension
+        title (str): The title to use for the plot
+        output_file_extension (str, optional): The file extension to use with the output file. Do not include the period. Defaults to "png"
+
+    Returns:
+        List[float]: The list of the extracted average values from each plateau
+    """
+    # Prepare series
+    time_data = []
+    resistance_top = []
+    resistance_middle = []
+    resistance_bottom = []
+
+    with open(file, 'r') as f:
+        for line in f.readlines():
+            parts = line.strip().split(",")
+            if len(parts) != 4:
+                continue  # Skip malformed lines
+            try:
+                r1, r2, r3, t = map(float, parts)
+                resistance_top.append(r1)
+                resistance_middle.append(r2)
+                resistance_bottom.append(r3)
+                time_data.append(t)
+            except ValueError:
+                continue  # Skip lines that fail to parse
+
+    # Plot the data
+    plt.figure(figsize=(12, 9))
+    plt.plot(time_data, resistance_top, label="Top", color="red")
+    plt.plot(time_data, resistance_middle, label="Middle", color="green")
+    plt.plot(time_data, resistance_bottom, label="Bottom", color="blue")
+
+    plt.title(title, fontsize=25)
+    plt.grid(True)
+    plt.xlabel("Time (s)", fontsize=25)
+    plt.ylabel("Resistance (Ohm)", fontsize=25)
+    plt.tick_params(labelsize=20)
+    plt.legend(fontsize=20)
+    plt.tight_layout()
+
+    full_output_path = f"{output_file}_SERIES.{output_file_extension}"
+    print(f"Saving {os.path.abspath(full_output_path)}")
+    print(f"\tCurrent File: {os.path.basename(full_output_path)}")
+    plt.savefig(full_output_path)
+    plt.show()
+
+
+if __name__ == "__main__":
+    out_dir = "../../test_files/"
+    file = gather_data(
+        "COM3", "test", output_file_dir=out_dir, output_image_dir=out_dir
+    )[-1]
+    
+    plot(file, out_dir+"what", "Test")
