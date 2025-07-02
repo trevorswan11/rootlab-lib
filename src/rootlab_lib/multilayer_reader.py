@@ -5,6 +5,8 @@ import os
 from typing import List, Tuple
 import random
 import matplotlib.animation as animation
+import statistics
+
 
 class _MockSerial:
     """Simulates a basic serial.Serial interface."""
@@ -49,7 +51,7 @@ def gather_data(
         thresh (int, optional): The number of readings gathered before the plot updates
 
     Returns:
-        Tuple(List[float], List[float], List[float], List[float], str): (R1_series, R2_series, R3_series, time_series, output_file_path)
+        Tuple[List[float], List[float], List[float], List[float], str]: (R1_series, R2_series, R3_series, time_series, output_file_path)
     """
     ser = _MockSerial(0.1) if mock else serial.Serial(port=port, baudrate=baudrate)
     curr_date, curr_time = time.strftime("%y-%m-%d"), time.strftime("%H-%M-%S")
@@ -72,9 +74,9 @@ def gather_data(
     ax.set_title(title)
     ax.grid(True)
 
-    line1, = ax.plot([], [], label="Bottom")
-    line2, = ax.plot([], [], label="Middle")
-    line3, = ax.plot([], [], label="Top")
+    (line1,) = ax.plot([], [], label="Bottom")
+    (line2,) = ax.plot([], [], label="Middle")
+    (line3,) = ax.plot([], [], label="Top")
     ax.legend()
 
     f = open(text_path, "w")
@@ -101,12 +103,12 @@ def gather_data(
             R2_trim = R2[-thresh:]
             R3_trim = R3[-thresh:]
             t_trim = t[-thresh:]
-            
+
             # Bring values into reference resistance range
             if relative is not None:
-                R1_trim = [res1 / relative for res1 in R1_trim] 
-                R2_trim = [res2 / relative for res2 in R2_trim] 
-                R3_trim = [res3 / relative for res3 in R3_trim] 
+                R1_trim = [res1 / relative for res1 in R1_trim]
+                R2_trim = [res2 / relative for res2 in R2_trim]
+                R3_trim = [res3 / relative for res3 in R3_trim]
 
             line1.set_data(t_trim, R1_trim)
             line2.set_data(t_trim, R2_trim)
@@ -131,6 +133,7 @@ def gather_data(
     print(f"Plot saved to {image_path}")
     return R1, R2, R3, t, text_path
 
+
 def plot(
     file: str,
     output_file: str,
@@ -149,8 +152,6 @@ def plot(
         resistance_unit (str, optional): The unit to use for the y-axis. This will be formatted as "Resistance ({resistance_unit})". Defaults to "Ohm"
         output_file_extension (str, optional): The file extension to use with the output file. Do not include the period. Defaults to "png"
 
-    Returns:
-        List[float]: The list of the extracted average values from each plateau
     """
     # Prepare series
     time_data = []
@@ -158,7 +159,7 @@ def plot(
     resistance_middle = []
     resistance_bottom = []
 
-    with open(file, 'r') as f:
+    with open(file, "r") as f:
         for line in f.readlines():
             parts = line.strip().split(",")
             if len(parts) != 4:
@@ -193,10 +194,73 @@ def plot(
     plt.show()
 
 
+def analyze(
+    file: str,
+    output_file: str,
+) -> List[Tuple[float]]:
+    """Reads the resistance data from the file and writes statistics about each channel to the output file
+
+    Args:
+        file (str): The file with raw data formatted as {r1},{r2},{r3},{time}, where r1 is the top and r3 is the bottom. The time slot is not read and is hence optional
+        output_file (str): The output file to save the data to
+
+    Returns:
+        List[Tuple[float]]: (mean, median, std, minim, maxim) for each layer, where List[0] is layer 1 and List[2] is layer 3
+    """
+    resistance_top = []
+    resistance_middle = []
+    resistance_bottom = []
+
+    with open(file, "r") as f:
+        for line in f.readlines():
+            parts = line.strip().split(",")
+            if len(parts) != 3 and len(parts) != 4:
+                continue  # Skip malformed lines
+            try:
+                if len(parts) == 3:
+                    r1 = float(parts[0])
+                    r2 = float(parts[1])
+                    r3 = float(parts[2])
+                    resistance_top.append(r1)
+                    resistance_middle.append(r2)
+                    resistance_bottom.append(r3)
+                elif len(parts) == 4:
+                    r1 = float(parts[0])
+                    r2 = float(parts[1])
+                    r3 = float(parts[2])
+                    resistance_top.append(r1)
+                    resistance_middle.append(r2)
+                    resistance_bottom.append(r3)
+            except ValueError:
+                continue  # Skip lines that fail to parse
+
+    with open(output_file, "w") as f:
+        res = [resistance_top, resistance_middle, resistance_bottom]
+        names = ["Top Resistor", "Middle Resistor", "Bottom Resistor"]
+
+        results = []
+
+        for r, n in zip(res, names):
+            f.write(f"{n}\n")
+            mean = statistics.mean(r)
+            median = statistics.median(r)
+            std = statistics.stdev(r)
+            minim = min(r)
+            maxim = max(r)
+            f.write(
+                f"  {mean = }\n  {median = }\n  {std = }\n  {minim = }\n  {maxim = }\n\n"
+            )
+            results.append((mean, median, std, minim, maxim))
+
+            print(f"{n}")
+            print(
+                f"  {mean = }\n  {median = }\n  {std = }\n  {minim = }\n  {maxim = }\n"
+            )
+
+
 if __name__ == "__main__":
     out_dir = "../../test_files/"
-    file = gather_data(
-        "COM3", "test", output_file_dir=out_dir, output_image_dir=out_dir
-    )[-1]
-    
-    plot(file, out_dir+"what", "Test")
+    file = "../../test_files/25-07-01_Resistance-INITIAL_15-21-19.txt"
+
+    plot(file, out_dir + "what", "Test")
+    analyze(file, out_dir + "who.txt")
