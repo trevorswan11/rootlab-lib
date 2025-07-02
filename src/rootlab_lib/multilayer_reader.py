@@ -217,13 +217,12 @@ def analyze(
             if len(parts) != 3 and len(parts) != 4:
                 continue  # Skip malformed lines
             try:
-                if len(parts) == 3:
-                    r1 = float(parts[0])
-                    r2 = float(parts[1])
-                    r3 = float(parts[2])
-                    resistance_top.append(r1)
-                    resistance_middle.append(r2)
-                    resistance_bottom.append(r3)
+                r1 = float(parts[0])
+                r2 = float(parts[1])
+                r3 = float(parts[2])
+                resistance_top.append(r1)
+                resistance_middle.append(r2)
+                resistance_bottom.append(r3)
             except ValueError:
                 continue  # Skip lines that fail to parse
 
