@@ -224,7 +224,7 @@ def analyze(
                     resistance_top.append(r1)
                     resistance_middle.append(r2)
                     resistance_bottom.append(r3)
-            except Exception:
+            except ValueError:
                 continue  # Skip lines that fail to parse
 
     with open(output_file, "w") as f:
@@ -237,7 +237,11 @@ def analyze(
             f.write(f"{n}\n")
             mean = statistics.mean(r)
             median = statistics.median(r)
-            std = statistics.stdev(r)
+            std = "NaN"
+            try:
+                statistics.stdev(r)
+            except:
+                std = "NaN"
             minim = min(r)
             maxim = max(r)
             f.write(
