@@ -238,7 +238,7 @@ def analyze(
             median = statistics.median(r)
             std = "NaN"
             try:
-                statistics.stdev(r)
+                std = statistics.stdev(r)
             except:
                 std = "NaN"
             minim = min(r)
