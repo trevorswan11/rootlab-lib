@@ -42,10 +42,10 @@ def gather_data(
         baudrate (int, optional): Baud rate for serial communication. Defaults to '9600'
         output_file_dir (str, optional): Directory to save the output file. Defaults to '.', the current directory
         output_image_dir (str, optional): Directory to save the output image. Defaults to '.', the current directory
-        output_image_dir (str, optional): Extension to use for the output image. You need not include the period. Defaults to 'png'
+        output_image_ext (str, optional): Extension to use for the output image. You need not include the period. Defaults to 'png'
         mock (bool, optional): Indicates whether or not serial data should be simulated
         relative (float, optional): Indicates whether to plot read resistance or relative resistance (read / reference value). Defaults to None
-        title (str): The title to use for the plot
+        title (str, optional): The title to use for the plot. Defaults to 'Resistance vs. Time'
         time_unit (str, optional): The unit to use for the x-axis. This will be formatted as "Time ({time_unit})". Defaults to "s"
         resistance_unit (str, optional): The unit to use for the y-axis. This will be formatted as "Resistance ({resistance_unit})". Defaults to "Ohm"
         thresh (int, optional): The number of readings gathered before the plot updates
@@ -77,7 +77,7 @@ def gather_data(
     (line1,) = ax.plot([], [], label="Bottom")
     (line2,) = ax.plot([], [], label="Middle")
     (line3,) = ax.plot([], [], label="Top")
-    ax.legend()
+    ax.legend(loc='upper right')
 
     f = open(text_path, "w")
 
