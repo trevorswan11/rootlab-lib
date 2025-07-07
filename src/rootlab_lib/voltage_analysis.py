@@ -1,7 +1,8 @@
 """The main plotting suite for analyzing data provided by the arduino."""
 
-from typing import List, Tuple
+from typing import List, Tuple, Union
 import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
 from scipy import stats
 import numpy as np
 import os
@@ -9,6 +10,7 @@ from rootlab_lib.plateau_processing import (
     average_voltage_analysis,
     find_plateaus,
     read_timed_voltage_data,
+    multilayer_read_timed_voltage_data,
 )
 
 # Default values to use thresholds, plateau lengths, and gap lengths
@@ -364,3 +366,97 @@ def series(
             output_image_extension,
             title_default,
         )
+
+
+# === MULTILAYER ===
+
+
+def _plot_analog_pin_data(filename: str, pin: Union[int, str], title: str = None) -> None:
+    label = ""
+    # decode pin user input
+    if pin == 0 or (isinstance(pin, str) and pin.lower() in ["a0", "0"]):
+        pin = 0
+        label += "A0"
+    elif pin == 1 or (isinstance(pin, str) and pin.lower() in ["a1", "1"]):
+        pin = 1
+        label += "A1"
+    elif pin == 2 or (isinstance(pin, str) and pin.lower() in ["a2", "2"]):
+        pin = 2
+        label += "A2"
+
+    label_top = label + " Top"
+    label_bot = label + " Bottom"
+
+    ((Vtop, Vbot), (vb1, vt1), (vb2, vt2), (t1, t2)) = (
+        multilayer_read_timed_voltage_data(filename)
+    )
+
+    m = {
+        # (level (top/bottom), pin (a0,1,2))
+        (0, 0): Vbot,
+        (0, 1): vb1,
+        (0, 2): vb2,
+        (1, 0): Vtop,
+        (1, 1): vt1,
+        (1, 2): vt2,
+    }
+    user_input_bot = (0, pin)
+    user_input_top = (1, pin)
+    if user_input_bot not in m or user_input_top not in m:
+        raise ValueError("You shouldn't be here")
+    v_plot_bot = m[user_input_bot]
+    v_plot_top = m[user_input_top]
+    
+    if title is None:
+        title = "Analog Pin " + label + " Time Series"
+
+    plt.figure(figsize=(8, 6))
+    plt.tick_params(labelsize=25, width=2, length=7)
+    plt.plot(t1, v_plot_bot, color="r", label=label_bot)
+    plt.plot(t2, v_plot_top, color="k", label=label_top)
+    plt.title(title)
+    plt.xlabel("Time (s)", fontsize=20)
+    plt.ylabel("Voltage (V)", fontsize=20)
+    plt.ylim(0, 5)
+    plt.legend()
+    plt.show()
+
+
+# TODO
+def multilayer_voltage_analysis(
+    filename: str,
+    V_to_check: str,
+    threshold: float = RECOMMENDED_THRESHOLD,
+    min_plateau_length: float = RECOMMENDED_MIN_PLATEAU_LENGTH - 5,
+    min_gap_length: float = RECOMMENDED_MIN_GAP_LENGTH,
+) -> Tuple[np.ndarray]:
+    """Calculates the average and std dev of the voltage values from the experiment
+
+    Args:
+        filename (str): A file with comma separated voltage and time data
+        V_to_check (str): Whether to analyze the top or bottom
+
+    Returns:
+        Tuple[np.ndarray]: Returns analysis output as (pos, V_avg_map, V_avg_column, V_std_column).
+    """
+    ((Vtop, Vbot), (vb1, vt1), (vb2, vt2), (t1, t2)) = (
+        multilayer_read_timed_voltage_data(filename)
+    )
+    voltage_data = []
+    if V_to_check == "T":
+        voltage_data = Vtop
+    elif V_to_check == "B":
+        voltage_data = Vbot
+    else:
+        raise ValueError("V_to_check must be either T or B, cannot analyze volt data")
+
+    plateaus_t = find_plateaus(vt2, threshold, min_plateau_length, min_gap_length)
+    plateaus_b = find_plateaus(vb2, threshold, min_plateau_length, min_gap_length)
+
+    num_plateaus_t = len(plateaus_t)
+    num_plateaus_b = len(plateaus_b)
+    print("Number of plateaus:", num_plateaus_t)
+    print("Number of plateaus b:", num_plateaus_b)
+
+    average_values = [plateau[0] for plateau in plateaus_b]
+    print("Average values for each plateau:", average_values)

@@ -22,6 +22,42 @@ def read_timed_voltage_data(filename: str) -> Tuple[List[float], List[float]]:
     return (time_series, voltage_series)
 
 
+def multilayer_read_timed_voltage_data(
+    filename: str,
+) -> Tuple[
+    Tuple[List[float], List[float]],
+    Tuple[List[float], List[float]],
+    Tuple[List[float], List[float]],
+    Tuple[List[float], List[float]],
+]:
+    """Reads time and voltage data from specified file
+
+    Args:
+        filename (str): A file with comma separated voltage and time data
+
+    Returns:
+        Tuple[Tuple[List[float]]]: ((Vtop, Vbot), (vb1, vt1), (vb2, vt2), (t1, t2))
+    """
+    Vtop, Vbot = [], []
+    vb1, vt1 = [], []
+    vb2, vt2 = [], []
+    t1, t2 = [], []
+    with open(filename, "r") as file:
+        for line in file.readlines():
+            line = line.strip("\n").split(",")
+            if line[4] == "B":
+                Vbot.append(float(line[0]))
+                vb1.append(float(line[1]))
+                vb2.append(float(line[2]))
+                t1.append(float(line[3]))
+            if line[4] == "T":
+                Vtop.append(float(line[0]))
+                vt1.append(float(line[1]))
+                vt2.append(float(line[2]))
+                t2.append(float(line[3]))
+    return ((Vtop, Vbot), (vb1, vt1), (vb2, vt2), (t1, t2))
+
+
 def find_plateaus(
     voltage_data: List[float],
     threshold: float,
@@ -108,7 +144,7 @@ def average_voltage_analysis(
         v_avg (List[float]): The average voltage data
 
     Raises:
-        ValueError: If the global V_to_check is not T or B
+        ValueError: If V_to_check is not T or B
 
     Returns:
         Tuple[np.ndarray]: Returns analysis output as (pos, V_avg_map, V_avg_column, V_std_column).
@@ -147,3 +183,4 @@ def average_voltage_analysis(
             V_avg_column[i] = np.mean(V_avg_map[i, :])
             V_std_column[i] = np.std(V_avg_map[i, :])
     return (pos, V_avg_map, V_avg_column, V_std_column)
+
