@@ -226,7 +226,7 @@ def heatmap(
     min_gap_length: float = RECOMMENDED_MIN_GAP_LENGTH,
     title: str = "Heatmap",
     prepend_zero: bool = False,
-    output_dir: str = ".",
+    output_dir: str = "./data/Heatmaps",
     output_image_extension: str = "png",
 ) -> None:
     """Creates a heatmap out of given data
@@ -238,7 +238,7 @@ def heatmap(
         min_gap_length (float, optional): The minimum voltage drop to break a plateau. Defaults to 0.01
         title (str, optional): The title to use for the map. Defaults to 'Heatmap'.
         prepend_zero (bool, optional): Determines if the plateaus should have 0 added to the start of the list. Defaults to False.
-        output_dir (str, optional): The directory to save the image to. Defaults to '.', the current directory
+        output_dir (str, optional): The directory to save the image to. Defaults to "./data/Heatmaps", relative to the current directory
         output_image_extension (str, optional): Specifies the image type to save the generated graph as. Do not include the dot. Defaults to png
     """
     v_averages = [
@@ -272,7 +272,7 @@ def regression(
     title: str = "Regression Model",
     prepend_zero: bool = False,
     intercept: bool = False,
-    output_dir: str = ".",
+    output_dir: str = "./data/Regression",
     output_image_extension: str = "png",
 ) -> None:
     """Creates a linear regression out of given data
@@ -285,7 +285,7 @@ def regression(
         title (str, optional): The title to use for the plot. Defaults to 'Regression Model'.
         prepend_zero (bool, optional): Determines if the plateaus should have 0 added to the start of the list. Defaults to False.
         intercept (bool, optional): Determines if the y-intercept should be variable and not fixed at (0,0). Defaults to False.
-        output_dir (str, optional): The directory to save the image to. Defaults to '.', the current directory
+        output_dir (str, optional): The directory to save the image to. Defaults to "./data/Regression", relative to the current directory
         output_image_extension (str, optional): Specifies the image type to save the generated graph as. Do not include the dot. Defaults to png
     """
     data = read_timed_voltage_data(filepath)
@@ -371,7 +371,19 @@ def series(
 # === MULTILAYER ===
 
 
-def _plot_analog_pin_data(filename: str, pin: Union[int, str], title: str = None) -> None:
+def _plot_analog_pin_data(
+    filepath: str,
+    pin: Union[int, str],
+    title: str = None,
+    output_dir: str = "./data/Series",
+    output_image_extension: str = "png",
+) -> None:
+    basename = os.path.basename(filepath)
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(
+        output_dir, f"{os.path.splitext(basename)[0]}.{output_image_extension}"
+    )
+
     label = ""
     # decode pin user input
     if pin == 0 or (isinstance(pin, str) and pin.lower() in ["a0", "0"]):
@@ -388,7 +400,7 @@ def _plot_analog_pin_data(filename: str, pin: Union[int, str], title: str = None
     label_bot = label + " Bottom"
 
     ((Vtop, Vbot), (vb1, vt1), (vb2, vt2), (t1, t2)) = (
-        multilayer_read_timed_voltage_data(filename)
+        multilayer_read_timed_voltage_data(filepath)
     )
 
     m = {
@@ -406,7 +418,7 @@ def _plot_analog_pin_data(filename: str, pin: Union[int, str], title: str = None
         raise ValueError("You shouldn't be here")
     v_plot_bot = m[user_input_bot]
     v_plot_top = m[user_input_top]
-    
+
     if title is None:
         title = "Analog Pin " + label + " Time Series"
 
@@ -417,8 +429,109 @@ def _plot_analog_pin_data(filename: str, pin: Union[int, str], title: str = None
     plt.title(title)
     plt.xlabel("Time (s)", fontsize=20)
     plt.ylabel("Voltage (V)", fontsize=20)
+    plt.tight_layout()
     plt.ylim(0, 5)
     plt.legend()
+    print(f"Saving {os.path.abspath(output_file)}")
+    print(f"\tCurrent File: {os.path.basename(output_file)}")
+    plt.savefig(output_file)
+    plt.show()
+
+
+def _plot_original_voltage_pos_series(
+    filepath: str,
+    layer: Union[int, str] = None,
+    title: str = "Voltage Series",
+    plateaus: bool = False,
+    threshold: float = RECOMMENDED_THRESHOLD,
+    min_plateau_length: float = RECOMMENDED_MIN_PLATEAU_LENGTH - 5,
+    min_gap_length: float = RECOMMENDED_MIN_GAP_LENGTH,
+    legend: bool = False,
+    output_series_dir: str = "./data/Series",
+    output_plats_dir: str = "./data/Plats",
+    output_image_extension: str = "png",
+) -> None:
+    basename = os.path.basename(filepath)
+    output_dir = output_plats_dir if plateaus else output_series_dir
+    os.makedirs(output_dir, exist_ok=True)
+    output_file = os.path.join(output_dir, f"{os.path.splitext(basename)[0]}")
+
+    ((Vtop, Vbot), (_, _), (vb2, vt2), (t1, t2)) = multilayer_read_timed_voltage_data(
+        filepath
+    )
+    plateaus_t = find_plateaus(vt2, threshold, min_plateau_length, min_gap_length)
+    plateaus_b = find_plateaus(vb2, threshold, min_plateau_length, min_gap_length)
+
+    plt.figure(figsize=(8, 6))
+    plt.tick_params(labelsize=25, width=2, length=7)
+    ok = False
+    if (
+        layer is None
+        or layer == 0
+        or (isinstance(layer, str) and layer.lower() in ["bottom", "b", "bot", "lower"])
+    ):
+        plt.plot(range(len(Vbot)), vb2, color="blue", label="Voltage Series Bottom")
+        output_file += "_Bottom"
+        if plateaus:
+            vavg = []
+            avg_time = []
+            for average, start, end in plateaus_t:
+                time_values = range(start, end + 1)
+                voltage_values = [vt2[i] for i in time_values]
+                average_time = (t2[start] + t2[end]) / 2
+                average_interval = (start + end) / 2
+                plt.plot(
+                    time_values,
+                    voltage_values,
+                    label=f"Plateau {average_time:.2f}s, Avg: {average:.2f}V",
+                    color="magenta",
+                    zorder=5,
+                )
+                plt.scatter(average_interval, average, color="k", zorder=5)
+                vavg.append(average)
+                avg_time.append(average_time)
+        ok = True
+    if (
+        layer is None
+        or layer == 1
+        or (isinstance(layer, str) and layer.lower() in ["top", "t", "upper"])
+    ):
+        plt.plot(range(len(Vtop)), vt2, color="orange", label="Voltage Series Top")
+        output_file += "_Top"
+        if plateaus:
+            vavgb = []
+            avg_timeb = []
+            for average, start, end in plateaus_b:
+                time_values = range(start, end + 1)
+                voltage_values = [vb2[i] for i in time_values]
+                average_time = (t2[start] + t2[end]) / 2
+                average_interval = (start + end) / 2
+                plt.plot(
+                    time_values,
+                    voltage_values,
+                    label=f"Plateau {average_time:.2f}s, Avg: {average:.2f}V",
+                    color="red",
+                )
+                plt.scatter(average_interval, average, color="k", zorder=5)
+                vavgb.append(average)
+                avg_timeb.append(average_time)
+        ok = True
+    if not ok:
+        raise ValueError("Layer must be either None, 0, or 1")
+
+    output_file = (
+        f"{output_file}_SERIES{"-plats" if plateaus else ""}.{output_image_extension}"
+    )
+
+    plt.title(title)
+    plt.xlabel("Time (s)", fontsize=25)
+    plt.ylabel("Position (cm)", fontsize=25)
+    if legend:
+        plt.legend()
+    plt.tight_layout()
+    print(f"Saving {os.path.abspath(output_file)}")
+    print(f"\tCurrent File: {os.path.basename(output_file)}")
+    plt.savefig(output_file)
     plt.show()
 
 
