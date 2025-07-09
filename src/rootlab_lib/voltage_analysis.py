@@ -535,6 +535,63 @@ def _plot_original_voltage_pos_series(
     plt.show()
 
 
+def _plot_inferred_positions(
+    filepath: str,
+    threshold: float = RECOMMENDED_THRESHOLD,
+    min_plateau_length: float = RECOMMENDED_MIN_PLATEAU_LENGTH - 5,
+    min_gap_length: float = RECOMMENDED_MIN_GAP_LENGTH,
+):
+    ((Vtop, Vbot), (_, _), (vb2, vt2), (t1, t2)) = multilayer_read_timed_voltage_data(
+        filepath
+    )
+    plateaus_t = find_plateaus(vt2, threshold, min_plateau_length, min_gap_length)
+    plateaus_b = find_plateaus(vb2, threshold, min_plateau_length, min_gap_length)
+
+    vavg = np.asarray([average for average, _, _ in plateaus_t])
+    vavgb = np.asarray([average for average, _, _ in plateaus_b])
+    
+    avg_time, avg_timeb = [], []
+    for _, start, end in plateaus_t:
+        average_time = (t2[start] + t2[end]) / 2
+        avg_time.append(average_time)
+    
+    for _, start, end in plateaus_b:
+        average_time = (t2[start] + t2[end]) / 2
+        avg_timeb.append(average_time)
+    
+    pos_x = vavg / 1.66
+    pos_y = vavgb / 1.66
+    
+    print(pos_y)
+    
+    pos_x_real = np.asarray([1.5, 1.5, 1.5, 1.5, 1.5])
+    pos_y_real = np.asarray([2.5, 2.0, 1.5, 1.0, 0.5])
+    
+    error_x = pos_x - pos_x_real
+    error_y = pos_y - pos_y_real
+    
+    # dif_sq = np.sqrt((pos_x - pos_x_real) ** 2 + (pos_y - pos_y_real) ** 2) * 10  # mm
+    # print("difference squared:")
+    # print(dif_sq)
+    # print("mean difference squared:")
+    # print(np.mean(dif_sq))
+    
+    plt.figure(figsize=(8, 6))
+    plt.tick_params(labelsize=25, width=2, length=7)
+    plt.scatter(
+        pos_x, pos_y, c=range(len(pos_x)), s=50, marker="s", label="Inferred Position"
+    )
+    plt.scatter(pos_x_real, pos_y_real, c=range(len(pos_x)), s=50, label="Actual Position")
+    plt.scatter(pos_x_real, pos_y_real, c=range(len(pos_x)), s=50, alpha=0.25)
+    plt.xlabel("Actual Position (cm)", fontsize=25)
+    plt.ylabel("Inferred Position(cm)", fontsize=25)
+    plt.legend(loc="upper right", frameon=False, fontsize=15)
+    plt.xlim(-0.25, 3.75)
+    plt.ylim(0, 3.5)
+    # plt.grid(True)
+    plt.show()
+    
+
 # TODO
 def multilayer_voltage_analysis(
     filename: str,
