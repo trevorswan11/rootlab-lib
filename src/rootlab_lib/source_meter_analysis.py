@@ -247,6 +247,7 @@ def analyze_concat(
     plt.grid(True)
 
     if log_scale:
+        plt.xscale('log')
         plt.yscale("log")
 
     plt.tight_layout()
