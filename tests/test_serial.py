@@ -36,13 +36,43 @@ def test_plot_suite():
         title_plateaus="Test Data",
         plateaus=True,
     )
+    pass
     voltage_analysis.heatmap(filepath, output_dir=out_dir, title="Test Data")
     voltage_analysis.regression(filepath, output_dir=out_dir, title="Test Data")
     voltage_analysis.regression(
         filepath, output_dir=out_dir, title="Test Data", intercept=True
     )
+    
+def test_weird():
+    filepath = "../test_data/weird_behavior.txt"
+    out_dir = "../test_files/"
+
+    voltage_analysis.series(
+        filepath,
+        output_plats_dir=out_dir,
+        output_series_dir=out_dir,
+        title_default="Weird Behaving Data",
+        title_plateaus="Weird Behaving Data",
+    )
+    voltage_analysis.series(
+        filepath,
+        output_plats_dir=out_dir,
+        output_series_dir=out_dir,
+        title_default="Weird Behaving Data",
+        title_plateaus="Weird Behaving Data",
+        plateaus=True,
+        threshold=0.2
+    )
+    pass
+    voltage_analysis.heatmap(filepath, output_dir=out_dir, title="Weird Behaving Data", threshold=0.2)
+    voltage_analysis.regression(filepath, output_dir=out_dir, title="Weird Behaving Data", threshold=0.2)
+    voltage_analysis.regression(
+        filepath, output_dir=out_dir, title="Weird Behaving Data", intercept=True, threshold=0.2
+    )
 
 
 if __name__ == "__main__":
-    test_reader_mock()
-    test_plot_suite()
+    # test_reader_mock()
+    # test_plot_suite()
+    test_weird()
+    pass

@@ -475,6 +475,8 @@ def series(
     legend_font_size: int = 20,
     tick_param_font_size: int = 15,
     legend_loc: str = "upper right",
+    time_unit: str = "s",
+    voltage_unit: str = "V",
     line_label: str = "Voltage",
     line_color: str = "black",
     plateau_line_marker_color: str = "red",
@@ -502,6 +504,8 @@ def series(
         tick_param_font_size (int, optional): The fontsize to use for the plot's ticks. Defaults to 15.
         legend (bool, optional): Whether to show a legend on the final plot. Defaults to True.
         legend_loc (str, optional): The location of the legend. Defaults to "upper right".
+        time_unit (str): The unit to use for the x-axis. This will be formatted as "Time ({time_unit})". Defaults to "s"
+        voltage_unit (str): The unit to use for the y-axis. This will be formatted as "Voltage ({voltage_unit})". Defaults to "V". 
         line_label (str, optional): The label to use for the plotted line. Defaults to 'Resistance'.
         line_color (str, optional): The color to use for the plotted line. Defaults to 'black'.
         grid (bool, optional): Determines whether or not to show a gray grid on the plot. Defaults to False.
@@ -523,19 +527,20 @@ def series(
             output_file,
             output_image_extension,
             title_plateaus,
+            time_unit,
+            voltage_unit,
             legend,
             axis_font_size,
             title_font_size,
             legend_font_size,
             tick_param_font_size,
-            legend,
             legend_loc,
             line_label,
             grid,
             figsize,
-            line_color,
             plateau_line_marker_color,
-            plateau_point_marker_color
+            plateau_point_marker_color,
+            line_color,
         )
     else:
         _plot_voltage_series(
@@ -543,17 +548,19 @@ def series(
             data[1],
             output_file,
             output_image_extension,
-            title_default,
-            axis_font_size,
-            title_font_size,
-            legend_font_size,
-            tick_param_font_size,
-            legend,
-            legend_loc,
-            line_label,
-            grid,
-            figsize,
-            line_color,
+            title=title_default,
+            time_unit=time_unit,
+            voltage_unit=voltage_unit,
+            axis_font_size=axis_font_size,
+            title_font_size=title_font_size,
+            legend_font_size=legend_font_size,
+            tick_param_font_size=tick_param_font_size,
+            legend=legend,
+            legend_loc=legend_loc,
+            line_label=line_label,
+            grid=grid,
+            figsize=figsize,
+            line_color=line_color,
         )
 
 

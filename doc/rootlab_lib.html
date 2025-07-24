@@ -25,6 +25,8 @@
             <ul>
   <li><a href="#what-is-this">What is this?</a></li>
   <li><a href="#instructions">Instructions</a></li>
+  <li><a href="#documentation">Documentation</a></li>
+  <li><a href="#updating">Updating</a></li>
 </ul>
 
 
@@ -66,6 +68,14 @@ rootlab_lib    </h1>
 <pre><code>pip install rootlab-lib
 </code></pre>
 
+<h2 id="documentation">Documentation</h2>
+
+<p><code>pdoc</code> is used to generate all of the documentation for this library. You can access it locally by opening <code>index.html</code> in the <code>doc</code> folder. If you need help with a function, it is probably over-documented in the library documentation.</p>
+
+<h2 id="updating">Updating</h2>
+
+<p>If you have permission and a valid key, you can update the package using the update.bat script. This will attempt to push to PyPI, and will prompt for a API token at the end of the script running. This will regenerate documentation. Ensure that you are working with a valid version of the necessary packages, and that the version of the library you are trying to push has not been used already. If either of these are not satisfied, the tool will tell you what went wrong and it is then your job to fix it.</p>
+
 <h3 id="spyder">Spyder</h3>
 
 <p>If using Spyder (Conda is your package manager or you do not have pip), you MUST download python <a href="https://www.python.org/downloads/">here</a> and change the interpreter for Spyder to the downloaded python version. When you download python using the link above, note the installation folder of the interpreter and copy it to your clipboard so that you can paste the path in Spyder. To change the path to the interpreter in Spyder, Select <code>Tools</code>, <code>Settings</code>, then <code>Python Interpreter</code>. At the top of this page, check the box that allows you to enter a custom interpreter, paste the path you copied earlier. Restart Spyder, and enter the command it tells you to use to fix any issues with the new interpreter. It should be something like <code>pip install spyder-kernels</code>. You can now run <code>pip install rootlab-lib</code> without issue. You may need to restart Spyder again for the changes to take effect.</p>
@@ -88,19 +98,25 @@ rootlab_lib    </h1>
 </span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="sd">pip install rootlab-lib</span>
 </span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="sd">```</span>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="sd">### Spyder</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="sd">If using Spyder (Conda is your package manager or you do not have pip), you MUST download python [here](https://www.python.org/downloads/) and change the interpreter for Spyder to the downloaded python version. When you download python using the link above, note the installation folder of the interpreter and copy it to your clipboard so that you can paste the path in Spyder. To change the path to the interpreter in Spyder, Select `Tools`, `Settings`, then `Python Interpreter`. At the top of this page, check the box that allows you to enter a custom interpreter, paste the path you copied earlier. Restart Spyder, and enter the command it tells you to use to fix any issues with the new interpreter. It should be something like `pip install spyder-kernels`. You can now run `pip install rootlab-lib` without issue. You may need to restart Spyder again for the changes to take effect.</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="sd">## Documentation</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="sd">`pdoc` is used to generate all of the documentation for this library. You can access it locally by opening `index.html` in the `doc` folder. If you need help with a function, it is probably over-documented in the library documentation.</span>
 </span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">If you already have python installed, then you must find out where your python interpreter is located on your system. This can be down by opening a terminal and typing `where python`. You can also just google it if this doesn&#39;t work!</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">## Updating</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="sd">If you have permission and a valid key, you can update the package using the update.bat script. This will attempt to push to PyPI, and will prompt for a API token at the end of the script running. This will regenerate documentation. Ensure that you are working with a valid version of the necessary packages, and that the version of the library you are trying to push has not been used already. If either of these are not satisfied, the tool will tell you what went wrong and it is then your job to fix it.</span>
 </span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="kn">from</span> <span class="nn">.serial_reader</span> <span class="kn">import</span> <span class="o">*</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="kn">from</span> <span class="nn">.voltage_analysis</span> <span class="kn">import</span> <span class="o">*</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="kn">from</span> <span class="nn">.plateau_processing</span> <span class="kn">import</span> <span class="o">*</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="kn">from</span> <span class="nn">.source_meter_analysis</span> <span class="kn">import</span> <span class="o">*</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="kn">from</span> <span class="nn">.vkx150_analysis</span> <span class="kn">import</span> <span class="o">*</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a><span class="kn">from</span> <span class="nn">.multilayer_reader</span> <span class="kn">import</span> <span class="o">*</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a><span class="kn">from</span> <span class="nn">.instron_analysis</span> <span class="kn">import</span> <span class="o">*</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="sd">### Spyder</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="sd">If using Spyder (Conda is your package manager or you do not have pip), you MUST download python [here](https://www.python.org/downloads/) and change the interpreter for Spyder to the downloaded python version. When you download python using the link above, note the installation folder of the interpreter and copy it to your clipboard so that you can paste the path in Spyder. To change the path to the interpreter in Spyder, Select `Tools`, `Settings`, then `Python Interpreter`. At the top of this page, check the box that allows you to enter a custom interpreter, paste the path you copied earlier. Restart Spyder, and enter the command it tells you to use to fix any issues with the new interpreter. It should be something like `pip install spyder-kernels`. You can now run `pip install rootlab-lib` without issue. You may need to restart Spyder again for the changes to take effect.</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="sd">If you already have python installed, then you must find out where your python interpreter is located on your system. This can be down by opening a terminal and typing `where python`. You can also just google it if this doesn&#39;t work!</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a><span class="kn">from</span> <span class="nn">.serial_reader</span> <span class="kn">import</span> <span class="o">*</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a><span class="kn">from</span> <span class="nn">.voltage_analysis</span> <span class="kn">import</span> <span class="o">*</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a><span class="kn">from</span> <span class="nn">.plateau_processing</span> <span class="kn">import</span> <span class="o">*</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a><span class="kn">from</span> <span class="nn">.source_meter_analysis</span> <span class="kn">import</span> <span class="o">*</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a><span class="kn">from</span> <span class="nn">.vkx150_analysis</span> <span class="kn">import</span> <span class="o">*</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a><span class="kn">from</span> <span class="nn">.multilayer_reader</span> <span class="kn">import</span> <span class="o">*</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a><span class="kn">from</span> <span class="nn">.instron_analysis</span> <span class="kn">import</span> <span class="o">*</span>
 </span></pre></div>
 
 
