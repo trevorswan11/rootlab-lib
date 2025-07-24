@@ -116,7 +116,8 @@ def find_plateaus(
 
 
 def plateau_analysis(
-    plateaus: List[Tuple], std_out: bool = False
+    plateaus: List[Tuple],
+    std_out: bool = False,
 ) -> Tuple[int, List[float]]:
     """Returns the number of plateaus and all of the average plateau values
 
@@ -183,4 +184,3 @@ def average_voltage_analysis(
             V_avg_column[i] = np.mean(V_avg_map[i, :])
             V_std_column[i] = np.std(V_avg_map[i, :])
     return (pos, V_avg_map, V_avg_column, V_std_column)
-

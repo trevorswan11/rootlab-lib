@@ -32,6 +32,18 @@ def gather_data(
     title: str = "Voltage vs. Time",
     mock: bool = False,
     thresh: int = 20,
+    time_unit: str = "s",
+    voltage_unit: str = "V",
+    axis_font_size: int = 25,
+    title_font_size: int = 30,
+    legend_font_size: int = 20,
+    tick_param_font_size: int = 15,
+    legend: bool = True,
+    legend_loc: str = "upper right",
+    line_label: str = "Voltage",
+    line_color: str = "black",
+    grid: bool = False,
+    figsize: Tuple[int, int] = (12, 9),
 ) -> Tuple[List[float], List[float], str]:
     """
     Reads and plots serial data in real-time, and saves to a timestamped .txt file.
@@ -44,16 +56,30 @@ def gather_data(
         output_image_dir (str, optional): Directory to save the output image. Defaults to '.', the current directory
         output_image_ext (str, optional): Extension to use for the output image. You need not include the period. Defaults to 'png'
         title (str, optional): The title to use for the plot. Defaults to 'Voltage vs. Time'
-        mock (bool, optional): Indicates whether or not serial data should be simulated
-        thresh (int, optional): The number of readings gathered before the plot updates
-
+        mock (bool, optional): Indicates whether or not serial data should be simulated. Defaults to False.
+        thresh (int, optional): The number of readings gathered before the plot updates. Defaults to 20.
+        time_unit (str, optional): The unit to use for the x-axis. This will be formatted as "Time ({time_unit})". Defaults to "s"
+        voltage_unit (str, optional): The unit to use for the y-axis. This will be formatted as "Voltage ({voltage_unit})". Defaults to "V"
+        axis_font_size (int, optional): The fontsize to use for the plot's axes. Defaults to 25.
+        title_font_size (int, optional): The fontsize to use for the plot title. Defaults to 30.
+        legend_font_size (int, optional): The fontsize to use for the plot legend, if enabled. Defaults to 20.
+        tick_param_font_size (int, optional): The fontsize to use for the plot's ticks. Defaults to 15.
+        legend (bool, optional): Whether to show a legend on the final plot. Defaults to True.
+        legend_loc (str, optional): The location of the legend. Defaults to "upper right".
+        line_label (str, optional): The label to use for the plotted line. Defaults to 'Voltage'.
+        line_color (str, optional): The color to use for the plotted line. Defaults to 'black'.
+        grid (bool, optional): Determines whether or not to show a gray grid on the plot. Defaults to False.
+        figsize (Tuple[int, int], optional): The figsize to use for the figure. Defaults to (12,9).
+        
     Returns:
         Tuple(List[float], List[float], str): (voltage_series, time_series, output_file_path)
     """
     try:
         # Create the instance and set the port to the users request
         serial_instance = (
-            _MockSerialBasic(0.1) if mock else serial.Serial(port=port, baudrate=baudrate)
+            _MockSerialBasic(0.1)
+            if mock
+            else serial.Serial(port=port, baudrate=baudrate)
         )
 
         # Initialize the output file and its location location
@@ -74,12 +100,16 @@ def gather_data(
 
         # Initialize the plot for real time plotting
         plt.ion()
-        fig, ax = plt.subplots(figsize=(12, 9))
-        (line,) = ax.plot([], [], color="blue")
-        ax.set_xlabel("Time (s)")
-        ax.set_ylabel("Voltage (V)")
-        ax.set_title(title)
-        ax.grid(True)
+        fig, ax = plt.subplots(figsize=figsize)
+        (line,) = ax.plot([], [], label=line_label, color=line_color)
+        ax.set_xlabel(f"Time ({time_unit})", fontsize=axis_font_size)
+        ax.set_ylabel(f"Voltage ({voltage_unit})", fontsize=axis_font_size)
+        ax.set_title(title, fontsize=title_font_size)
+        ax.tick_params(labelsize=tick_param_font_size)
+        if grid:
+            ax.grid(True)
+        if legend:
+            ax.legend(fontsize=legend_font_size, loc=legend_loc)
 
         num_readings = 0
 
@@ -92,6 +122,7 @@ def gather_data(
             fig.canvas.draw()
             fig.canvas.flush_events()
             plt.ioff()
+            plt.tick_params(labelsize=tick_param_font_size)
             plt.tight_layout()
             print(f"Saving {os.path.abspath(image_path)}")
             print(f"\tCurrent File: {image_name}")
@@ -100,13 +131,13 @@ def gather_data(
 
         # If the program exists without updating the plot, it saves a white screen, this ensures the data is saved
         def save_as():
-            plt.figure(figsize=(12, 9))
+            plt.figure(figsize=figsize)
             plt.plot(t_data, v_data, label=title)
-            plt.title(title, fontsize=25)
+            plt.title(title, fontsize=title_font_size)
             plt.grid(True)
-            plt.xlabel("Time (s)", fontsize=25)
-            plt.ylabel("Voltage (V)", fontsize=25)
-            plt.tick_params(labelsize=25, width=2, length=7)
+            plt.xlabel(f"Time ({time_unit})", fontsize=axis_font_size)
+            plt.ylabel(f"Voltage ({voltage_unit})", fontsize=axis_font_size)
+            plt.tick_params(labelsize=tick_param_font_size, width=2, length=7)
             plt.tight_layout()
             plt.savefig(image_path)
             plt.close()
@@ -155,6 +186,7 @@ def gather_data(
     except Exception as e:
         print(f"Unknown error: {e}")
 
+
 class _MockSerialPCB:
     """Simulates a PCB based serial.Serial interface."""
 
@@ -164,7 +196,8 @@ class _MockSerialPCB:
     def readline(self):
         time.sleep(self.delay)
         return f"{random.uniform(0, 5):.3f},{random.uniform(0, 5):.3f},{random.uniform(0, 5):.3f},{random.choice(['T', 'B'])}\n".encode()
-    
+
+
 class PCBDataOut:
     def __init__(self, vt1, vt2, vt3, vb1, vb2, vb3, t, t1, t2, index, *args):
         self.VT = vt1
@@ -178,7 +211,8 @@ class PCBDataOut:
         self.t2 = t2
         self.index = index
         self.store = args
-        
+
+
 def gather_pcb_data(
     port: str,
     name: str,
@@ -190,6 +224,27 @@ def gather_pcb_data(
     title_senses: str = "VT1, VT2, VT3",
     mock: bool = False,
     thresh: int = 1000,
+    time_unit: str = "s",
+    voltage_unit: str = "V",
+    axis_font_size: int = 25,
+    title_font_size: int = 30,
+    legend_font_size: int = 20,
+    tick_param_font_size: int = 15,
+    drive_legend: bool = True,
+    sense_legend: bool = True,
+    legend_loc: str = "upper right",
+    top_drive_label: str = "Top Drive",
+    top_drive_color: str = None,
+    bottom_drive_label: str = "Bottom Drive",
+    bottom_drive_color: str = None,
+    vt1_label: str = "VT1",
+    vt1_color: str = None,
+    vt2_label: str = "VT2",
+    vt2_color: str = None,
+    vt3_label: str = "VT3",
+    vt3_color: str = None,
+    grid: bool = False,
+    figsize: Tuple[int, int] = (12, 9),
 ) -> Tuple[PCBDataOut, str]:
     """
     Reads and plots serial data in real-time, and saves to a timestamped .txt file.
@@ -205,11 +260,36 @@ def gather_pcb_data(
         title_drives (str, optional): The title to use for the sense layer's plot. Defaults to "VT1, VT2, VT3"
         mock (bool, optional): Indicates whether or not serial data should be simulated
         thresh (int, optional): The number of readings gathered before the plot updates
-
+        time_unit (str, optional): The unit to use for the x-axis. This will be formatted as "Time ({time_unit})". Defaults to "s"
+        voltage_unit (str, optional): The unit to use for the y-axis. This will be formatted as "Voltage ({voltage_unit})". Defaults to "V"
+        axis_font_size (int, optional): The fontsize to use for the plot's axes. Defaults to 25.
+        title_font_size (int, optional): The fontsize to use for the plot title. Defaults to 30.
+        legend_font_size (int, optional): The fontsize to use for the plot legend, if enabled. Defaults to 20.
+        tick_param_font_size (int, optional): The fontsize to use for the plot's ticks. Defaults to 15.
+        drive_legend (bool, optional): Whether to show a legend on the drive layer subplot. Defaults to True.
+        sense_legend (bool, optional): Whether to show a legend on the sense layer subplot. Defaults to True.
+        legend_loc (str, optional): The location of the legends. Defaults to "upper right".
+        top_drive_label (str, optional): The label to use for the top drive layer's line. Defaults to 'Top Drive'.
+        top_drive_color (str, optional): The color to use for the top drive layer's line. If None, uses default color cycle. Defaults to None.
+        bottom_drive_label (str, optional): The label to use for the bottom drive layer's line. Defaults to 'Bottom'.
+        bottom_drive_color (str, optional): The color to use for the bottom drive layer's line. If None, uses default color cycle. Defaults to None.
+        vt1_label (str, optional): The label to use for the vt1 sense layer's line. Defaults to 'VT1'
+        vt1_color (str, optional): The color to use for the vt1 sense layer's line. If None, uses the default color cycle. Defaults to None.
+        vt2_label (str, optional): The label to use for the vt2 sense layer's line. Defaults to 'VT2'
+        vt2_color (str, optional): The color to use for the vt2 sense layer's line. If None, uses the default color cycle. Defaults to None.
+        vt3_label (str, optional): The label to use for the vt3 sense layer's line. Defaults to 'VT3'
+        vt3_color (str, optional): The color to use for the vt3 sense layer's line. If None, uses the default color cycle. Defaults to None.
+        grid (bool, optional): Determines whether or not to show a gray grid on the plot. Defaults to False.
+        figsize (Tuple[int, int], optional): The figsize to use for the figure. Defaults to (12,9).
+        
     Returns:
         Tuple(PCBDataOut, str): (PCBDataOut[VT, VT2, VT3, VB, VB2, VB3, t, t1, t2, index], output_file_path)
     """
-    ser = _MockSerialPCB(0.1) if mock else serial.Serial(port=port, baudrate=baudrate, timeout=0.1)
+    ser = (
+        _MockSerialPCB(0.1)
+        if mock
+        else serial.Serial(port=port, baudrate=baudrate, timeout=0.1)
+    )
     curr_date, curr_time = time.strftime("%y-%m-%d"), time.strftime("%H-%M-%S")
     base_name = f"{curr_date}_{name}_{curr_time}"
 
@@ -248,21 +328,47 @@ def gather_pcb_data(
     reader_thread.start()
 
     # === Setup plot ===
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8))
-    ax1.set_title(title_drives)
-    ax2.set_title(title_senses)
-    ax1.set_ylabel("Voltage (V)")
-    ax2.set_ylabel("Voltage (V)")
-    ax2.set_xlabel("Time (s)")
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=figsize)
+    ax1.set_title(title_drives, fontsize=title_font_size)
+    ax2.set_title(title_senses, fontsize=title_font_size)
+    ax1.set_ylabel(f"Voltage ({voltage_unit})", fontsize=axis_font_size)
+    ax2.set_ylabel(f"Voltage ({voltage_unit})", fontsize=axis_font_size)
+    ax2.set_xlabel(f"Time ({time_unit})", fontsize=axis_font_size)
+    ax1.tick_params(labelsize=tick_param_font_size)
+    ax2.tick_params(labelsize=tick_param_font_size)
+    if grid:
+        ax1.grid(True)
+        ax2.grid(True)
 
-    line_top, = ax1.plot([], [], label="Top Drive")
-    line_bottom, = ax1.plot([], [], label="Bottom Drive")
-    ax1.legend(loc='upper right')
+    # drive layer config
+    if top_drive_color is not None:
+        (line_top,) = ax1.plot([], [], label=top_drive_label, color=top_drive_color)
+    else:
+        (line_top,) = ax1.plot([], [], label=top_drive_label)
+    if bottom_drive_color is not None:
+        (line_bottom,) = ax1.plot(
+            [], [], label=bottom_drive_label, color=bottom_drive_color
+        )
+    else:
+        (line_bottom,) = ax1.plot([], [], label=bottom_drive_label)
+    if drive_legend:
+        ax1.legend(fontsize=legend_font_size, loc=legend_loc)
 
-    line_vt1, = ax2.plot([], [], label="VT1")
-    line_vt2, = ax2.plot([], [], label="VT2")
-    line_vt3, = ax2.plot([], [], label="VT3")
-    ax2.legend(loc='upper right')
+    # sense layer config
+    if vt1_color is not None:
+        (line_vt1,) = ax2.plot([], [], label=vt1_label, color=vt1_color)
+    else:
+        (line_vt1,) = ax2.plot([], [], label=vt1_label)
+    if vt2_color is not None:
+        (line_vt2,) = ax2.plot([], [], label=vt2_label, color=vt2_color)
+    else:
+        (line_vt2,) = ax2.plot([], [], label=vt2_label)
+    if vt3_color is not None:
+        (line_vt3,) = ax2.plot([], [], label=vt3_label, color=vt3_color)
+    else:
+        (line_vt3,) = ax2.plot([], [], label=vt3_label)
+    if sense_legend:
+        ax2.legend(fontsize=legend_font_size, loc=legend_loc)
 
     def update_plot(_):
         updated = False
@@ -287,10 +393,10 @@ def gather_pcb_data(
                 t.append(timestamp)
                 index.append(flag)
                 updated = True
-                
+
                 if not updated:
                     return
-            
+
             except Exception as e:
                 print("Parse error:", e)
 
@@ -306,7 +412,9 @@ def gather_pcb_data(
             ax.autoscale_view()
 
     global ani
-    ani = animation.FuncAnimation(fig, update_plot, interval=100, cache_frame_data=False)
+    ani = animation.FuncAnimation(
+        fig, update_plot, interval=100, cache_frame_data=False
+    )
     plt.tight_layout()
     try:
         plt.show()

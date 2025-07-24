@@ -32,6 +32,20 @@ def gather_data(
     time_unit: str = "s",
     resistance_unit: str = "Ohm",
     thresh: int = 1000,
+    axis_font_size: int = 25,
+    title_font_size: int = 30,
+    legend_font_size: int = 20,
+    tick_param_font_size: int = 15,
+    legend: bool = True,
+    legend_loc: str = "upper right",
+    top_label: str = "Top",
+    top_color: str = "red",
+    middle_label: str = "Middle",
+    middle_color: str = "green",
+    bottom_label: str = "Bottom",
+    bottom_color: str = "blue",
+    grid: bool = False,
+    figsize: Tuple[int, int] = (12, 9),
 ) -> Tuple[List[float], List[float], str]:
     """
     Reads and plots serial data in real-time, and saves to a timestamped .txt file.
@@ -49,7 +63,21 @@ def gather_data(
         time_unit (str, optional): The unit to use for the x-axis. This will be formatted as "Time ({time_unit})". Defaults to "s"
         resistance_unit (str, optional): The unit to use for the y-axis. This will be formatted as "Resistance ({resistance_unit})". Defaults to "Ohm"
         thresh (int, optional): The number of readings gathered before the plot updates
-
+        axis_font_size (int, optional): The fontsize to use for the plot's axes. Defaults to 25.
+        title_font_size (int, optional): The fontsize to use for the plot title. Defaults to 30.
+        legend_font_size (int, optional): The fontsize to use for the plot legend, if enabled. Defaults to 20.
+        tick_param_font_size (int, optional): The fontsize to use for the plot's ticks. Defaults to 15.
+        legend (bool, optional): Whether to show a legend on the final plot. Defaults to True.
+        legend_loc (str, optional): The location of the legend. Defaults to "upper right".
+        top_label (str, optional): The label to use for the top layer. Defaults to 'Top'.
+        top_color (str, optional): The color to use for the top layer. Defaults to 'red'.
+        middle_label (str, optional): The label to use for the top layer. Defaults to 'Middle'.
+        middle_color (str, optional): The color to use for the top layer. Defaults to 'green'.
+        bottom_label (str, optional): The label to use for the top layer. Defaults to 'Bottom'.
+        bottom_color (str, optional): The color to use for the top layer. Defaults to 'blue'.
+        grid (bool, optional): Determines whether or not to show a gray grid on the plot. Defaults to False.
+        figsize (Tuple[int, int], optional): The figsize to use for the figure. Defaults to (12,9).
+        
     Returns:
         Tuple[List[float], List[float], List[float], List[float], str]: (R1_series, R2_series, R3_series, time_series, output_file_path)
     """
@@ -67,17 +95,20 @@ def gather_data(
     R1, R2, R3, t = [], [], [], []
     t0 = time.time()
 
-    fig, ax = plt.subplots(figsize=(12, 9))
+    fig, ax = plt.subplots(figsize=figsize)
     # ax.set_ylim(1000, 50000)
-    ax.set_xlabel(f"Time ({time_unit})")
-    ax.set_ylabel(f"Resistance ({resistance_unit})")
-    ax.set_title(title)
-    ax.grid(True)
+    ax.set_xlabel(f"Time ({time_unit})", fontsize=axis_font_size)
+    ax.set_ylabel(f"Resistance ({resistance_unit})", fontsize=axis_font_size)
+    ax.set_title(title, fontsize=title_font_size)
+    if grid:
+        ax.grid(True)
+    ax.tick_params(labelsize=tick_param_font_size)
 
-    (line1,) = ax.plot([], [], label="Bottom")
-    (line2,) = ax.plot([], [], label="Middle")
-    (line3,) = ax.plot([], [], label="Top")
-    ax.legend(loc='upper right')
+    (line1,) = ax.plot([], [], label=bottom_label, color=bottom_color)
+    (line2,) = ax.plot([], [], label=middle_label, color=middle_color)
+    (line3,) = ax.plot([], [], label=top_label, color=top_color)
+    if legend:
+        ax.legend(fontsize=legend_font_size, loc=legend_loc)
 
     f = open(text_path, "w")
 
@@ -120,6 +151,7 @@ def gather_data(
             print(f"Error in update: {e}")
 
     ani = animation.FuncAnimation(fig, update, interval=50, cache_frame_data=False)
+    plt.tick_params(labelsize=tick_param_font_size)
     plt.tight_layout()
 
     try:
@@ -140,9 +172,25 @@ def plot(
     title: str,
     time_unit: str = "s",
     resistance_unit: str = "Ohm",
-    output_file_extension: str = "png",
+    output_image_dir: str = "./data/Multilayer-Series",
+    output_image_extension: str = "png",
+    timestamp: bool = False,
+    axis_font_size: int = 25,
+    title_font_size: int = 30,
+    legend_font_size: int = 20,
+    tick_param_font_size: int = 15,
+    legend: bool = True,
+    legend_loc: str = "upper right",
+    top_label: str = "Top",
+    top_color: str = "red",
+    middle_label: str = "Middle",
+    middle_color: str = "green",
+    bottom_label: str = "Bottom",
+    bottom_color: str = "blue",
+    grid: bool = False,
+    figsize: Tuple[int, int] = (12, 9),
 ) -> None:
-    """Creates a plot of the voltage data against time. Overwrites any plot or file of the same name. Only use for recovery.
+    """Creates a plot of the voltage data against time. Can overwrite any plot or file of the same name. Only use for recovery.
 
     Args:
         file (str): The file with raw data formatted as {r1},{r2},{r3},{time}, where r1 is the top and r3 is the bottom
@@ -150,8 +198,23 @@ def plot(
         title (str): The title to use for the plot
         time_unit (str, optional): The unit to use for the x-axis. This will be formatted as "Time ({time_unit})". Defaults to "s"
         resistance_unit (str, optional): The unit to use for the y-axis. This will be formatted as "Resistance ({resistance_unit})". Defaults to "Ohm"
-        output_file_extension (str, optional): The file extension to use with the output file. Do not include the period. Defaults to "png"
-
+        output_image_dir (str, optional): The directory to automatically save the output to. Defaults to "./data/Multilayer-Series".
+        output_image_extension (str, optional): The file extension to use with the output file. Do not include the period. Defaults to "png"
+        timestamp (bool, optional): Whether to include the data and time with the saved image to prevent overwriting previously saved plots. Defaults to False.
+        axis_font_size (int, optional): The fontsize to use for the plot's axes. Defaults to 25.
+        title_font_size (int, optional): The fontsize to use for the plot title. Defaults to 30.
+        legend_font_size (int, optional): The fontsize to use for the plot legend, if enabled. Defaults to 20.
+        tick_param_font_size (int, optional): The fontsize to use for the plot's ticks. Defaults to 15.
+        legend (bool, optional): Whether to show a legend on the final plot. Defaults to True.
+        legend_loc (str, optional): The location of the legend. Defaults to "upper right".
+        top_label (str, optional): The label to use for the top layer. Defaults to 'Top'.
+        top_color (str, optional): The color to use for the top layer. Defaults to 'red'.
+        middle_label (str, optional): The label to use for the top layer. Defaults to 'Middle'.
+        middle_color (str, optional): The color to use for the top layer. Defaults to 'green'.
+        bottom_label (str, optional): The label to use for the top layer. Defaults to 'Bottom'.
+        bottom_color (str, optional): The color to use for the top layer. Defaults to 'blue'.
+        grid (bool, optional): Determines whether or not to show a gray grid on the plot. Defaults to False.
+        figsize (Tuple[int, int], optional): The figsize to use for the figure. Defaults to (12,9).
     """
     # Prepare series
     time_data = []
@@ -174,20 +237,29 @@ def plot(
                 continue  # Skip lines that fail to parse
 
     # Plot the data
-    plt.figure(figsize=(12, 9))
-    plt.plot(time_data, resistance_top, label="Top", color="red")
-    plt.plot(time_data, resistance_middle, label="Middle", color="green")
-    plt.plot(time_data, resistance_bottom, label="Bottom", color="blue")
+    plt.figure(figsize=figsize)
+    plt.plot(time_data, resistance_top, label=top_label, color=top_color)
+    plt.plot(time_data, resistance_middle, label=middle_label, color=middle_color)
+    plt.plot(time_data, resistance_bottom, label=bottom_label, color=bottom_color)
 
-    plt.title(title, fontsize=25)
-    plt.grid(True)
-    plt.xlabel(f"Time ({time_unit})", fontsize=25)
-    plt.ylabel(f"Resistance ({resistance_unit})", fontsize=25)
-    plt.tick_params(labelsize=20)
-    plt.legend(fontsize=20)
+    plt.title(title, fontsize=title_font_size)
+    if grid:
+        plt.grid(True)
+    plt.xlabel(f"Time ({time_unit})", fontsize=axis_font_size)
+    plt.ylabel(f"Resistance ({resistance_unit})", fontsize=axis_font_size)
+    plt.tick_params(labelsize=tick_param_font_size)
+    if legend:
+        plt.legend(fontsize=legend_font_size, loc=legend_loc)
     plt.tight_layout()
 
-    full_output_path = f"{output_file}_SERIES.{output_file_extension}"
+    output_path = f"{output_file}_SERIES"
+    if timestamp:
+        curr_date, curr_time = time.strftime("%y-%m-%d"), time.strftime("%H-%M-%S")
+        output_path = f"{curr_date}_{output_path}_{curr_time}"
+    os.makedirs(output_image_dir, exist_ok=True)
+    full_output_path = os.path.join(
+        output_image_dir, f"{output_path}.{output_image_extension}"
+    )
     print(f"Saving {os.path.abspath(full_output_path)}")
     print(f"\tCurrent File: {os.path.basename(full_output_path)}")
     plt.savefig(full_output_path)

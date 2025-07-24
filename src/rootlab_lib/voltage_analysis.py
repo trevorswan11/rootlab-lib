@@ -27,6 +27,18 @@ def _plot_voltage_series(
     output_file: str,
     output_file_extension: str,
     title: str,
+    time_unit: str,
+    voltage_unit: str,
+    axis_font_size: int,
+    title_font_size: int,
+    legend_font_size: int,
+    tick_param_font_size: int,
+    legend: bool,
+    legend_loc: str,
+    line_label: str,
+    grid: bool,
+    figsize: Tuple[int, int],
+    line_color: str = None,
 ) -> None:
     """Creates a plot of the voltage data against time
 
@@ -35,18 +47,36 @@ def _plot_voltage_series(
         voltage_data (List[float]): The voltage data from the file
         output_file (str): The output file to save the plot to. You need not specify the file extension
         output_file_extension (str): The file extension to use with the output file
-        title (str, optional): The title to use for the plot. Defaults to 'Voltage Series'.
-
+        title (str): The title to use for the plot.
+        time_unit (str): The unit to use for the x-axis. This will be formatted as "Time ({time_unit})".
+        voltage_unit (str): The unit to use for the y-axis. This will be formatted as "Voltage ({voltage_unit})".
+        axis_font_size (int): The fontsize to use for the plot's axes.
+        title_font_size (int): The fontsize to use for the plot title.
+        legend_font_size (int): The fontsize to use for the plot legend, if enabled.
+        tick_param_font_size (int): The fontsize to use for the plot's ticks.
+        legend (bool): Whether to show a legend on the final plot.
+        legend_loc (str): The location of the legend.
+        line_label (str): The label to use for the plotted line.
+        grid (bool): Determines whether or not to show a gray grid on the plot.
+        figsize (Tuple[int, int]): The figsize to use for the figure.
+        line_color (str, optional): The color to use for the plotted line. If None, uses the default color cycle. Defaults to None.
+        
     Returns:
         List[float]: The list of the extracted average values from each plateau
     """
-    plt.figure(figsize=(12, 9))
-    plt.plot(time_data, voltage_data, label=title)
-    plt.title(title, fontsize=25)
-    plt.grid(True)
-    plt.xlabel("Time (s)", fontsize=25)
-    plt.ylabel("Voltage (V)", fontsize=25)
-    plt.tick_params(labelsize=25, width=2, length=7)
+    plt.figure(figsize=figsize)
+    if line_color is not None:
+        plt.plot(time_data, voltage_data, label=line_label, color=line_color)
+    else:
+        plt.plot(time_data, voltage_data, label=line_label)
+    plt.title(title, fontsize=title_font_size)
+    if legend:
+        plt.legend(fontsize=legend_font_size, loc=legend_loc)
+    if grid:
+        plt.grid(True)
+    plt.xlabel(f"Time ({time_unit})", fontsize=axis_font_size)
+    plt.ylabel(f"Voltage ({voltage_unit})", fontsize=axis_font_size)
+    plt.tick_params(labelsize=tick_param_font_size, width=2, length=7)
     plt.tight_layout()
     output_file = f"{output_file}_SERIES.{output_file_extension}"
     print(f"Saving {os.path.abspath(output_file)}")
@@ -62,7 +92,20 @@ def _plot_voltage_series_plateaus(
     output_file: str,
     output_file_extension: str,
     title: str,
+    time_unit: str,
+    voltage_unit: str,
     legend: bool,
+    axis_font_size: int,
+    title_font_size: int,
+    legend_font_size: int,
+    tick_param_font_size: int,
+    legend_loc: str,
+    line_label: str,
+    grid: bool,
+    figsize: Tuple[int, int],
+    avg_plateau_line_color: str,
+    avg_plateau_point_color: str,
+    line_color: str = None,
 ) -> List[float]:
     """Creates a plot of the voltage data and highlights and extracts the average values.
 
@@ -72,15 +115,29 @@ def _plot_voltage_series_plateaus(
         plateaus (List[Tuple]): The plateaus calculated and determined through analysis
         output_file (str): The output file to save the plot to. You need not specify the file extension
         output_file_extension (str): The file extension to use with the output file
-        title (str): The title to use for the plot. Defaults to 'Voltage Series with Plateaus'.
+        title (str): The title to use for the plot.
+        time_unit (str): The unit to use for the x-axis. This will be formatted as "Time ({time_unit})".
+        voltage_unit (str): The unit to use for the y-axis. This will be formatted as "Voltage ({voltage_unit})".
         legend (bool): Determines whether or not to show the legend. Defaults to False for readability.
-
+        axis_font_size (int): The fontsize to use for the plot's axes.
+        title_font_size (int): The fontsize to use for the plot title.
+        legend_font_size (int): The fontsize to use for the plot legend, if enabled.
+        tick_param_font_size (int): The fontsize to use for the plot's ticks.
+        legend_loc (str): The location of the legend.
+        line_label (str): The label to use for the plotted line.
+        grid (bool): Determines whether or not to show a gray grid on the plot.
+        figsize (Tuple[int, int]): The figsize to use for the figure.
+        line_color (str, optional): The color to use for the plotted line. If None, uses the default color cycle. Defaults to None.
+        
     Returns:
         List[float]: The list of the extracted average values from each plateau
     """
     # plot the original series
-    plt.figure(figsize=(12, 9))
-    plt.plot(time_data, voltage_data, label=title, color="blue")
+    plt.figure(figsize=figsize)
+    if line_color is not None:
+        plt.plot(time_data, voltage_data, label=line_label, color=line_color)
+    else:
+        plt.plot(time_data, voltage_data, label=line_label)
 
     # plot each plateau as a scatter, including the average at the average time
     v_avg = []
@@ -97,18 +154,19 @@ def _plot_voltage_series_plateaus(
             time_values,
             voltage_values,
             label=f"Plateau: {average_time:.2f}s, Avg: {average:.2f}V",
-            color="red",
+            color=avg_plateau_line_color,
         )
-        plt.scatter(average_time, average, color="black", zorder=5)
+        plt.scatter(average_time, average, color=avg_plateau_point_color, zorder=5)
 
     # format the plot for readers convenience
-    plt.title("Voltage Series with Plateaus")
-    plt.grid(True)
-    plt.xlabel("Time (s)", fontsize=25)
-    plt.ylabel("Voltage", fontsize=25)
-    plt.tick_params(labelsize=25, width=2, length=7)
+    plt.title(title, fontsize=title_font_size)
     if legend:
-        plt.legend()
+        plt.legend(fontsize=legend_font_size, loc=legend_loc)
+    if grid:
+        plt.grid(True)
+    plt.xlabel(f"Time ({time_unit})", fontsize=axis_font_size)
+    plt.ylabel(f"Voltage ({voltage_unit})", fontsize=axis_font_size)
+    plt.tick_params(labelsize=tick_param_font_size, width=2, length=7)
     plt.tight_layout()
 
     # show the plot and return the average voltages
@@ -122,7 +180,17 @@ def _plot_voltage_series_plateaus(
 
 
 def _plot_voltage_heatmap(
-    V_avg_map: np.ndarray, output_file: str, output_file_extension: str, title: str
+    V_avg_map: np.ndarray,
+    output_file: str,
+    output_file_extension: str,
+    title: str,
+    x_axis_unit: str,
+    y_axis_unit: str,
+    cbar_voltage_unit: str,
+    axis_font_size: int,
+    title_font_size: int,
+    tick_param_font_size: int,
+    figsize: Tuple[int, int],
 ) -> None:
     """Plots an analysis of the data as a heatmap
 
@@ -130,21 +198,27 @@ def _plot_voltage_heatmap(
         V_avg_map (np.ndarray): The average voltages
         output_file (str): The output file to save the plot. You need not specify the file extension
         output_file_extension (str): The file extension to use with the output file
-        title (str): The title of the plot to show. Defaults to 'Voltage Heatmap'
+        title (str): The title of the plot to show.
+        x_axis_unit (str): The unit to use for the x-axis. This will be formatted as "Position ({x_axis_unit})".
+        y_axis_unit (str): The unit to use for the y-axis. This will be formatted as "Position ({y_axis_unit})".
+        cbar_voltage_unit (str): The unit to use for the colorbar. This will be formatted as "Voltage ({cbar_voltage_unit})".
+        axis_font_size (int): The fontsize to use for the plot's axes and colorbar.
+        title_font_size (int): The fontsize to use for the plot title.
+        tick_param_font_size (int): The fontsize to use for the plot's ticks.
     """
     # Add the data to the figure
-    plt.figure(figsize=(12, 9))
+    plt.figure(figsize=figsize)
     plt.imshow(V_avg_map, vmin=0, vmax=5, cmap="viridis")
     plt.xticks(tuple(i for i in range(0, 7)))
 
     # Plot the voltage series with labeled axes and colors for presentation
-    plt.xlabel("Position (0.5 cm)", fontsize=25)
-    plt.ylabel("Position (0.5 cm)", fontsize=25)
-    plt.title(title, fontsize=25)
+    plt.xlabel(f"Position ({x_axis_unit})", fontsize=axis_font_size)
+    plt.ylabel(f"Position ({y_axis_unit})", fontsize=axis_font_size)
+    plt.title(title, fontsize=title_font_size)
     cbar = plt.colorbar()
-    cbar.set_label("Voltage (V)", fontsize=25)
-    cbar.ax.tick_params(labelsize=25)
-    plt.tick_params(labelsize=25, width=3, length=7)
+    cbar.set_label(f"Voltage ({cbar_voltage_unit})", fontsize=axis_font_size)
+    cbar.ax.tick_params(labelsize=tick_param_font_size)
+    plt.tick_params(labelsize=tick_param_font_size, width=3, length=7)
     plt.tight_layout()
     output_file = f"{output_file}_HEATMAP.{output_file_extension}"
     print(f"Saving {os.path.abspath(output_file)}")
@@ -161,6 +235,16 @@ def _plot_voltage_regression(
     output_file_extension: str,
     title: str,
     intercept: bool,
+    point_color: str,
+    line_color: str,
+    legend: bool,
+    legend_loc: str,
+    x_axis_unit: str,
+    y_axis_unit: str,
+    axis_font_size: int,
+    title_font_size: int,
+    tick_param_font_size: int,
+    legend_font_size: int,
 ) -> None:
     """Plots an analysis of the data as a heatmap
 
@@ -172,24 +256,34 @@ def _plot_voltage_regression(
         output_file_extension (str): The file extension to use with the output file
         title (str): The title of the plot to show
         intercept (bool): Determines if the y-intercept should be variable and not fixed at (0,0)
+        point_color (str): The color to use for the voltage points and their error bars (extracted plateaus).
+        line_color (str): The color to use for the fitted line.
+        legend (bool): Whether to display the legend which contains the line of best fit equation and R^2.
+        legend_loc (str): The location to place the legend, if enabled.
+        x_axis_unit (str): The unit to use for the x axis (position).
+        y_axis_unit (str): The unit to use for the y axis (voltage).
+        axis_font_size (int): The fontsize to use for the plot's axes.
+        title_font_size (int): The fontsize to use for the plot's title.
+        tick_param_font_size (int): The fontsize to use for the plot's ticks.
+        legend_font_size (int): The fontsize to use for the plot's legend, if enabled.
     """
     # Plot the average data for statistical analysis
     pos_full = np.array([0.0, 0.25, 0.75, 1.25, 1.75, 2.25, 3.0], dtype=float)
-    plt.title(title, fontsize=25)
-    plt.xlabel("Position (cm)", fontsize=25)
-    plt.ylabel("Voltage (V)", fontsize=25)
-    plt.tick_params(labelsize=25, width=2, length=7)
+    plt.title(title, fontsize=title_font_size)
+    plt.xlabel(f"Position ({x_axis_unit})", fontsize=axis_font_size)
+    plt.ylabel(f"Voltage ({y_axis_unit})", fontsize=axis_font_size)
+    plt.tick_params(labelsize=tick_param_font_size, width=2, length=7)
     plt.ylim((-0.9, 5.1))
     plt.xlim((-0.1, 3.1))
     plt.errorbar(
-        pos, V_avg_column, yerr=V_std_column, linestyle="None", marker="o", color="k"
+        pos, V_avg_column, yerr=V_std_column, linestyle="None", marker="o", color=point_color
     )
     if intercept:
         res = stats.linregress(pos, V_avg_column)
         plt.plot(
             pos_full,
             res[0] * pos_full + res[1],
-            "r",
+            line_color,
             label="V = %.2f x + %.2f\nR$^2$= %.4f" % (res[0], res[1], res[2] ** 2),
         )
     else:
@@ -200,10 +294,11 @@ def _plot_voltage_regression(
         plt.plot(
             pos_full,
             slope * pos_full,
-            "r",
+            line_color,
             label="V = %.2f x\nR$^2$= %.4f" % (slope, r2),
         )
-    plt.legend(loc="upper left", frameon=False, fontsize=20)
+    if legend:
+        plt.legend(loc=legend_loc, frameon=False, fontsize=legend_font_size)
     plt.tight_layout()
     output_file = (
         f"{output_file}_REGRESSION-intercept.{output_file_extension}"
@@ -228,6 +323,13 @@ def heatmap(
     prepend_zero: bool = False,
     output_dir: str = "./data/Heatmaps",
     output_image_extension: str = "png",
+    x_axis_unit: str = "0.5 cm",
+    y_axis_unit: str = "0.5 cm",
+    cbar_voltage_unit: str = "V",
+    axis_font_size: int = 25,
+    title_font_size: int = 30,
+    tick_param_font_size: int = 15,
+    figsize: Tuple[int, int] = (12,9),
 ) -> None:
     """Creates a heatmap out of given data
 
@@ -240,6 +342,13 @@ def heatmap(
         prepend_zero (bool, optional): Determines if the plateaus should have 0 added to the start of the list. Defaults to False.
         output_dir (str, optional): The directory to save the image to. Defaults to "./data/Heatmaps", relative to the current directory
         output_image_extension (str, optional): Specifies the image type to save the generated graph as. Do not include the dot. Defaults to png
+        x_axis_unit (str): The unit to use for the x-axis. This will be formatted as "Position ({x_axis_unit})". Defaults to "0.5 cm"
+        y_axis_unit (str): The unit to use for the y-axis. This will be formatted as "Position ({y_axis_unit})". Defaults to "0.5 cm"
+        cbar_voltage_unit (str): The unit to use for the colorbar. This will be formatted as "Voltage ({cbar_voltage_unit})". Defaults to "V"
+        axis_font_size (int, optional): The fontsize to use for the plot's axes. Defaults to 25.
+        title_font_size (int, optional): The fontsize to use for the plot title. Defaults to 30.
+        tick_param_font_size (int, optional): The fontsize to use for the plot's ticks. Defaults to 15.
+        figsize (Tuple[int, int], optional): The figsize to use for the figure. Defaults to (12,9).
     """
     v_averages = [
         v_avg
@@ -261,6 +370,13 @@ def heatmap(
         output_file,
         output_image_extension,
         title,
+        x_axis_unit,
+        y_axis_unit,
+        cbar_voltage_unit,
+        axis_font_size,
+        title_font_size,
+        tick_param_font_size,
+        figsize
     )
 
 
@@ -274,6 +390,16 @@ def regression(
     intercept: bool = False,
     output_dir: str = "./data/Regression",
     output_image_extension: str = "png",
+    point_color: str = 'black',
+    line_color: str = 'red',
+    legend: bool = True,
+    legend_loc: str = 'upper left',
+    position_unit: str = 'cm',
+    voltage_unit: str = 'V',
+    axis_font_size: int = 25,
+    title_font_size: int = 30,
+    tick_param_font_size: int = 15,
+    legend_font_size: int = 20,
 ) -> None:
     """Creates a linear regression out of given data
 
@@ -287,6 +413,16 @@ def regression(
         intercept (bool, optional): Determines if the y-intercept should be variable and not fixed at (0,0). Defaults to False.
         output_dir (str, optional): The directory to save the image to. Defaults to "./data/Regression", relative to the current directory
         output_image_extension (str, optional): Specifies the image type to save the generated graph as. Do not include the dot. Defaults to png
+        point_color (str, optional): The color to use for the voltage points and their error bars (extracted plateaus). Defaults to 'black'.
+        line_color (str, optional): The color to use for the fitted line. Defaults to 'red'.
+        legend (bool, optional): Whether to display the legend which contains the line of best fit equation and R^2. Defaults to True.
+        legend_loc (str, optional): The location to place the legend, if enabled. Defaults to 'upper left'.
+        position_unit (str, optional): The unit to use for the x axis (position). Defaults to 'cm'.
+        voltage_unit (str, optional): The unit to use for the y axis (voltage). Defaults to 'V'.
+        axis_font_size (int, optional): The fontsize to use for the plot's axes. Defaults to 25.
+        title_font_size (int, optional): The fontsize to use for the plot's title. Defaults to 30.
+        tick_param_font_size (int, optional): The fontsize to use for the plot's ticks. Defaults to 15.
+        legend_font_size (int, optional): The fontsize to use for the plot's legend, if enabled. Defaults to 20.
     """
     data = read_timed_voltage_data(filepath)
     v_averages = [
@@ -309,6 +445,16 @@ def regression(
         output_image_extension,
         title,
         intercept,
+        point_color,
+        line_color,
+        legend,
+        legend_loc,
+        position_unit,
+        voltage_unit,
+        axis_font_size,
+        title_font_size,
+        tick_param_font_size,
+        legend_font_size,
     )
 
 
@@ -324,6 +470,17 @@ def series(
     output_series_dir: str = "./data/Series",
     output_plats_dir: str = "./data/Plats",
     output_image_extension: str = "png",
+    axis_font_size: int = 25,
+    title_font_size: int = 30,
+    legend_font_size: int = 20,
+    tick_param_font_size: int = 15,
+    legend_loc: str = "upper right",
+    line_label: str = "Voltage",
+    line_color: str = "black",
+    plateau_line_marker_color: str = "red",
+    plateau_point_marker_color: str = "blue",
+    grid: bool = False,
+    figsize: Tuple[int, int] = (12, 9),
 ) -> None:
     """Creates the voltage series out of given data
 
@@ -339,6 +496,16 @@ def series(
         output_series_dir (str, optional): The directory to save the image to if the plateau flag is false. Defaults to '.', relative to the current directory
         output_plats_dir (str, optional): The directory to save the image to if the plateau flag is true. Defaults to './data/Plats', relative to the current directory
         output_image_extension (str, optional): Specifies the image type to save the generated graph as. Do not include the dot. Defaults to png
+        axis_font_size (int, optional): The fontsize to use for the plot's axes. Defaults to 25.
+        title_font_size (int, optional): The fontsize to use for the plot title. Defaults to 30.
+        legend_font_size (int, optional): The fontsize to use for the plot legend, if enabled. Defaults to 20.
+        tick_param_font_size (int, optional): The fontsize to use for the plot's ticks. Defaults to 15.
+        legend (bool, optional): Whether to show a legend on the final plot. Defaults to True.
+        legend_loc (str, optional): The location of the legend. Defaults to "upper right".
+        line_label (str, optional): The label to use for the plotted line. Defaults to 'Resistance'.
+        line_color (str, optional): The color to use for the plotted line. Defaults to 'black'.
+        grid (bool, optional): Determines whether or not to show a gray grid on the plot. Defaults to False.
+        figsize (Tuple[int, int], optional): The figsize to use for the figure. Defaults to (12,9).
     """
     data = read_timed_voltage_data(filepath)
     plats = find_plateaus(data[1], threshold, min_plateau_length, min_gap_length)
@@ -357,6 +524,18 @@ def series(
             output_image_extension,
             title_plateaus,
             legend,
+            axis_font_size,
+            title_font_size,
+            legend_font_size,
+            tick_param_font_size,
+            legend,
+            legend_loc,
+            line_label,
+            grid,
+            figsize,
+            line_color,
+            plateau_line_marker_color,
+            plateau_point_marker_color
         )
     else:
         _plot_voltage_series(
@@ -365,10 +544,21 @@ def series(
             output_file,
             output_image_extension,
             title_default,
+            axis_font_size,
+            title_font_size,
+            legend_font_size,
+            tick_param_font_size,
+            legend,
+            legend_loc,
+            line_label,
+            grid,
+            figsize,
+            line_color,
         )
 
 
 # === MULTILAYER ===
+# ========================================================================= CONSTRUCTION ZONE BEYOND THIS POINT ===============================================================================================
 
 
 def _plot_analog_pin_data(

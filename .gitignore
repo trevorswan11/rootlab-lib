@@ -184,8 +184,8 @@ cython_debug/
 test_data/
 test_files/
 translate/
-build.bat
-update.bat
-gendocs.bat
+# build.bat
+# update.bat
+# gendocs.bat
 .env
 data

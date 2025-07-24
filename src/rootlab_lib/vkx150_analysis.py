@@ -16,7 +16,7 @@ from scipy.ndimage import median_filter, gaussian_filter
 def heightmap(
     input_filepath: str,
     output_name: str,
-    output_dir: str = ".",
+    output_dir: str = "./data/Heightmaps",
     output_image_ext: str = "png",
     reading_flag_name: str = "Height:",
     horizontal_axis_label: str = "",
@@ -26,6 +26,9 @@ def heightmap(
     iterations: int = 0,
     method: str = "none",
     flatten: bool = False,
+    axis_font_size: int = 25,
+    title_font_size: int = 30,
+    figsize: Tuple[int, int] = (12, 9),
 ) -> List[List[float]]:
     """
     Writes and plots source meter resistance readings vs time and saves a .png of the data.
@@ -42,7 +45,11 @@ def heightmap(
         height_unit (str, optional): The unit of the height values reported. Defaults to an "nm" (nanometers)
         iterations (int, optional): Determines how many iterations of normalization should occur. This is not lossless and is performance intensive. Cannot be negative (will be clamped to [0, inf]). Defaults to 0
         method (str, optional): Determines the iteration algorithm {"none", "gaussian", "median", "bilateral"}. Defaults to "none"
-        flatten (bool, optional): Determines whether or not the program should attempt to correct tilt. Defaults to False
+        flatten (bool, optional): Determines whether or not the program should attempt to correct tilt. This is experimental, use the analyzer software. Defaults to False
+        axis_font_size (int, optional): The fontsize to use for the plot's axes. Defaults to 25.
+        title_font_size (int, optional): The fontsize to use for the plot title. Defaults to 30.
+        figsize (Tuple[int, int], optional): The figsize to use for the figure. Defaults to (12,9).
+        
     Returns:
         List[List[float]]: (height_data)
     """
@@ -156,15 +163,15 @@ def heightmap(
             min_height = np.amin(height_matrix)
             max_height = np.amax(height_matrix)
 
-            fig, ax = plt.subplots(figsize=(12, 9))
+            fig, ax = plt.subplots(figsize=figsize)
             im = ax.imshow(
                 height_matrix, vmin=min_height, vmax=max_height, cmap="viridis"
             )
 
             # Labels and axis settings
-            ax.set_title(title, fontsize=25, pad=20)
-            ax.set_xlabel(horizontal_axis_label, fontsize=15)
-            ax.set_ylabel(vertical_axis_label, fontsize=15)
+            ax.set_title(title, fontsize=title_font_size, pad=20)
+            ax.set_xlabel(horizontal_axis_label, fontsize=axis_font_size)
+            ax.set_ylabel(vertical_axis_label, fontsize=axis_font_size)
             ax.set_xticks([])
             ax.set_yticks([])
 
@@ -206,10 +213,12 @@ def compare_heightmaps(
     vertical_axis_label: str = "",
     title: str = "Comparison of VK-x150 Height Heatmaps",
     height_unit: str = "nm",
-    method: str = "none",
+    method: str = None,
     iterations: int = 0,
     flatten: bool = False,
     individual_colorbars: bool = False,
+    axis_font_size: int = 25,
+    title_font_size: int = 30,
     figsize: Tuple[int, int] = (12, 9),
 ) -> List[np.ndarray]:
     """
@@ -226,16 +235,18 @@ def compare_heightmaps(
         vertical_axis_label (str, optional): Label for the y-axis. Defaults to "".
         title (str, optional): Title of the overall figure. Defaults to "Comparison of VK-x150 Height Heatmaps".
         height_unit (str, optional): Unit to append to the colorbar label. Defaults to "nm" (nanometers).
-        method (str, optional): One of {"none", "gaussian", "median", "bilateral"}. Defaults to "none".
+        method (str, optional): Asserts that this is one of {None, "none", "gaussian", "median", "bilateral"}. Defaults to None.
         iterations (int, optional): Number of smoothing iterations. Defaults to 0.
-        flatten (bool, optional): Whether to apply tilt correction. Defaults to False.
+        flatten (bool, optional): Whether to apply tilt correction. This is experimental, use the analyzer software. Defaults to False.
         individual_colorbars (bool, optional): Whether to enforce a global colorbar or use individual ones per plot
+        axis_font_size (int, optional): The fontsize to use for the plot's axes. Defaults to 25.
+        title_font_size (int, optional): The fontsize to use for the plot title. Defaults to 30.
         figsize (Tuple[int, int], optional): Size of the figure. Defaults to (12, 9).
 
     Returns:
         List[np.ndarray]: List of processed height maps (as numpy arrays).
     """
-    assert method in {"none", "gaussian", "median", "bilateral"}, "Invalid method"
+    assert method in {None, "none", "gaussian", "median", "bilateral"}, "Invalid method"
     assert all(
         os.path.isfile(p) for p in input_filepaths
     ), "All input paths must be valid files"
@@ -364,9 +375,9 @@ def compare_heightmaps(
         cbar.ax.tick_params(labelsize=13)
 
     # Titles and layout
-    fig.suptitle(title, fontsize=27, x=0.5, y=0.995)
-    fig.supxlabel(horizontal_axis_label, fontsize=25)
-    fig.supylabel(vertical_axis_label, fontsize=25)
+    fig.suptitle(title, fontsize=title_font_size, x=0.5, y=0.995)
+    fig.supxlabel(horizontal_axis_label, fontsize=axis_font_size)
+    fig.supylabel(vertical_axis_label, fontsize=axis_font_size)
 
     # Clean layout
     fig.subplots_adjust(left=0.01, right=0.95, top=0.92, bottom=0.08, wspace=0.05)
