@@ -400,6 +400,7 @@ def regression(
     title_font_size: int = 30,
     tick_param_font_size: int = 15,
     legend_font_size: int = 20,
+    normalize: bool = True,
 ) -> None:
     """Creates a linear regression out of given data
 
@@ -423,6 +424,7 @@ def regression(
         title_font_size (int, optional): The fontsize to use for the plot's title. Defaults to 30.
         tick_param_font_size (int, optional): The fontsize to use for the plot's ticks. Defaults to 15.
         legend_font_size (int, optional): The fontsize to use for the plot's legend, if enabled. Defaults to 20.
+        normalize (bool, optional): Determines whether or not to shift the voltages to start at 0. It does not make sense to have this and the 'intercept' arg True at the same time. Defaults to True
     """
     data = read_timed_voltage_data(filepath)
     v_averages = [
@@ -431,6 +433,9 @@ def regression(
             data[1], threshold, min_plateau_length, min_gap_length
         )
     ]
+    if normalize:
+        minim = min(v_averages)
+        v_averages = [v - minim for v in v_averages]
     if prepend_zero:
         v_averages = [0] + v_averages
     pos, _, V_avg_column, V_std_column = average_voltage_analysis(v_averages)
