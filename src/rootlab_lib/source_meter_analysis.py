@@ -11,13 +11,13 @@ from itertools import cycle
 
 def voltage_readings_to_resistance_series(
     input_filepath: str,
-    output_dir: str | None,
+    output_dir: str = ".",
 ) -> str:
     """Converts the voltage data in a file to resistance series data and writes it out to a file of a similar name.
 
     Args:
         input_filepath (str): The filepath of the original file with the
-        output_dir (str | None): The directory to store the output file. If this is None, then the directory of the input is preserved
+        output_dir (str, optional): The directory to store the output file. Defaults to "."
 
     Returns:
         str: The filepath of the output file
