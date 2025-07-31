@@ -31,6 +31,8 @@ def voltage_readings_to_resistance_series(
     else:
         os.makedirs(output_dir, exist_ok=True)
 
+    if output_dir is None:
+        output_dir = "."
     # Parse CSV and isolate voltage + time data
     two_col_rows = []
     rest_rows = []
