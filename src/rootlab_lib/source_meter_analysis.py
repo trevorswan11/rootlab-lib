@@ -11,7 +11,7 @@ from itertools import cycle
 
 def voltage_readings_to_resistance_series(
     input_filepath: str,
-    output_dir: str = ".",
+    output_dir: str = "./converted",
 ) -> str:
     """Converts the voltage data in a file to resistance series data and writes it out to a file of a similar name.
 
@@ -26,13 +26,8 @@ def voltage_readings_to_resistance_series(
         raise FileNotFoundError(f"Input file not found: {input_filepath}")
 
     # Set output directory to input's dir if not provided
-    if output_dir is None:
-        output_dir = os.path.dirname(input_filepath)
-    else:
-        os.makedirs(output_dir, exist_ok=True)
+    os.makedirs(output_dir, exist_ok=True)
 
-    if output_dir is None:
-        output_dir = "."
     # Parse CSV and isolate voltage + time data
     two_col_rows = []
     rest_rows = []
@@ -163,7 +158,7 @@ def _read_time_resistance_data(filepath: str) -> Tuple[List[float], List[float]]
 def analyze(
     input_filepath: str,
     output_name: str,
-    output_dir: str = ".data/SourceMeter",
+    output_dir: str = "./data/SourceMeter",
     output_image_ext: str = "png",
     title: str = "Source Meter Readings",
     readings_unit: str = "Ohms",
