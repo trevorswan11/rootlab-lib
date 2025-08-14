@@ -28,3 +28,4 @@ from .source_meter_analysis import *
 from .vkx150_analysis import *
 from .multilayer_reader import *
 from .instron_analysis import *
+from .mark10_analysis import *

@@ -1,3 +1,4 @@
+"""An extremely basic and minimal interface for working with data from the instron tensile tester"""
 import os
 from typing import List, Tuple
 import matplotlib.pyplot as plt
@@ -100,7 +101,7 @@ def single_stress_strain(
     plt.savefig(image_path)
     plt.show()
     
-def multiple_stress_strain(
+def plot_multiple_stress_strain(
     filepaths: List[str],
     output_filename: str,
     labels: List[str] = [],
