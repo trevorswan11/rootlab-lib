@@ -42,7 +42,8 @@ def test_plot_suite():
     voltage_analysis.regression(
         filepath, output_dir=out_dir, title="Test Data", intercept=True
     )
-    
+
+
 def test_weird():
     filepath = "../test_data/weird_behavior.txt"
     out_dir = "../test_files/"
@@ -61,13 +62,21 @@ def test_weird():
         title_default="Weird Behaving Data",
         title_plateaus="Weird Behaving Data",
         plateaus=True,
-        threshold=0.2
+        threshold=0.2,
     )
     pass
-    voltage_analysis.heatmap(filepath, output_dir=out_dir, title="Weird Behaving Data", threshold=0.2)
-    voltage_analysis.regression(filepath, output_dir=out_dir, title="Weird Behaving Data", threshold=0.2)
+    voltage_analysis.heatmap(
+        filepath, output_dir=out_dir, title="Weird Behaving Data", threshold=0.2
+    )
     voltage_analysis.regression(
-        filepath, output_dir=out_dir, title="Weird Behaving Data", intercept=True, threshold=0.2
+        filepath, output_dir=out_dir, title="Weird Behaving Data", threshold=0.2
+    )
+    voltage_analysis.regression(
+        filepath,
+        output_dir=out_dir,
+        title="Weird Behaving Data",
+        intercept=True,
+        threshold=0.2,
     )
 
 

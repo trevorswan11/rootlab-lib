@@ -68,6 +68,7 @@ def voltage_readings_to_resistance_series(
 
     return output_path
 
+
 def extract_readings_to_resistance_series(
     input_filepath: str,
     output_dir: str | None,
@@ -77,7 +78,7 @@ def extract_readings_to_resistance_series(
     Args:
         input_filepath (str): The filepath of the original file with the
         output_dir (str | None): The directory to store the output file. If this is None, then the directory of the input is preserved
-        
+
     Returns:
         str: The filepath of the output file
     """
@@ -282,7 +283,7 @@ def analyze_concat(
     mark_shapes: bool = False,
     switch_labels: List[str] = None,
     switch_label_line_colors: List[str] = None,
-    switch_label_shape_color: str = 'red',
+    switch_label_shape_color: str = "red",
 ) -> Tuple[List[float], List[float], str]:
     """
     Reads and appends resistance vs time data from multiple files, resets time to start at 0, and plots it as one continuous curve.
@@ -367,30 +368,44 @@ def analyze_concat(
     plt.xlabel(f"Time ({time_unit})", fontsize=axis_font_size)
     plt.ylabel(f"Readings ({readings_unit})", fontsize=axis_font_size)
     plt.tick_params(labelsize=tick_param_font_size)
-    
+
     if mark_lines:
-        color_cycle = cycle(plt.rcParams['axes.prop_cycle'].by_key()['color'])
+        color_cycle = cycle(plt.rcParams["axes.prop_cycle"].by_key()["color"])
         if not switch_label_line_colors:
             switch_label_line_colors = [next(color_cycle) for _ in input_filepaths]
         elif len(switch_label_line_colors) < len(input_filepaths):
             # Pad with cyclic fallback colors
-            switch_label_line_colors += [next(color_cycle) for _ in range(len(input_filepaths) - len(switch_label_line_colors))]
+            switch_label_line_colors += [
+                next(color_cycle)
+                for _ in range(len(input_filepaths) - len(switch_label_line_colors))
+            ]
 
         first_label = switch_labels[0] if switch_labels else "File 1"
-        plt.axvline(x=0, linestyle="--", color=switch_label_line_colors[0], label=first_label)
+        plt.axvline(
+            x=0, linestyle="--", color=switch_label_line_colors[0], label=first_label
+        )
 
         for idx, switch_time in enumerate(switch_times):
             if idx == len(switch_times) - 1:
                 break
             label = switch_labels[idx + 1] if switch_labels else f"File {idx + 2}"
-            plt.axvline(x=switch_time, linestyle="--", color=switch_label_line_colors[idx + 1], label=label)
+            plt.axvline(
+                x=switch_time,
+                linestyle="--",
+                color=switch_label_line_colors[idx + 1],
+                label=label,
+            )
     elif mark_shapes:
         # Define a list of distinct marker styles
-        marker_styles = ['o', 's', 'D', '^', 'v', '<', '>', 'p', 'H', '*', 'X']
+        marker_styles = ["o", "s", "D", "^", "v", "<", ">", "p", "H", "*", "X"]
         used_labels = set()
 
         switch_points = [0] + switch_times
-        label_list = switch_labels if switch_labels else [f"File {i+1}" for i in range(len(switch_points))]
+        label_list = (
+            switch_labels
+            if switch_labels
+            else [f"File {i+1}" for i in range(len(switch_points))]
+        )
 
         for i, switch_time in enumerate(switch_points):
             idx = next((j for j, t in enumerate(all_times) if t >= switch_time), -1)
@@ -402,8 +417,14 @@ def analyze_concat(
                 label = label_list[i]
 
                 # Slight vertical offset
-                plt.scatter(time_val, resistance_val * 1.3, color=switch_label_shape_color, marker=marker, s=50,
-                            label=label if label not in used_labels else None)
+                plt.scatter(
+                    time_val,
+                    resistance_val * 1.3,
+                    color=switch_label_shape_color,
+                    marker=marker,
+                    s=50,
+                    label=label if label not in used_labels else None,
+                )
                 used_labels.add(label)
     if legend:
         plt.legend(fontsize=legend_font_size, loc=legend_loc)

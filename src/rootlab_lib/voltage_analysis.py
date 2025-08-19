@@ -60,7 +60,7 @@ def _plot_voltage_series(
         grid (bool): Determines whether or not to show a gray grid on the plot.
         figsize (Tuple[int, int]): The figsize to use for the figure.
         line_color (str, optional): The color to use for the plotted line. If None, uses the default color cycle. Defaults to None.
-        
+
     Returns:
         List[float]: The list of the extracted average values from each plateau
     """
@@ -128,7 +128,7 @@ def _plot_voltage_series_plateaus(
         grid (bool): Determines whether or not to show a gray grid on the plot.
         figsize (Tuple[int, int]): The figsize to use for the figure.
         line_color (str, optional): The color to use for the plotted line. If None, uses the default color cycle. Defaults to None.
-        
+
     Returns:
         List[float]: The list of the extracted average values from each plateau
     """
@@ -276,7 +276,12 @@ def _plot_voltage_regression(
     plt.ylim((-0.9, 5.1))
     plt.xlim((-0.1, 3.1))
     plt.errorbar(
-        pos, V_avg_column, yerr=V_std_column, linestyle="None", marker="o", color=point_color
+        pos,
+        V_avg_column,
+        yerr=V_std_column,
+        linestyle="None",
+        marker="o",
+        color=point_color,
     )
     if intercept:
         res = stats.linregress(pos, V_avg_column)
@@ -329,7 +334,7 @@ def heatmap(
     axis_font_size: int = 25,
     title_font_size: int = 30,
     tick_param_font_size: int = 15,
-    figsize: Tuple[int, int] = (12,9),
+    figsize: Tuple[int, int] = (12, 9),
 ) -> None:
     """Creates a heatmap out of given data
 
@@ -376,7 +381,7 @@ def heatmap(
         axis_font_size,
         title_font_size,
         tick_param_font_size,
-        figsize
+        figsize,
     )
 
 
@@ -390,12 +395,12 @@ def regression(
     intercept: bool = False,
     output_dir: str = "./data/Regression",
     output_image_extension: str = "png",
-    point_color: str = 'black',
-    line_color: str = 'red',
+    point_color: str = "black",
+    line_color: str = "red",
     legend: bool = True,
-    legend_loc: str = 'upper left',
-    position_unit: str = 'cm',
-    voltage_unit: str = 'V',
+    legend_loc: str = "upper left",
+    position_unit: str = "cm",
+    voltage_unit: str = "V",
     axis_font_size: int = 25,
     title_font_size: int = 30,
     tick_param_font_size: int = 15,
@@ -510,7 +515,7 @@ def series(
         legend (bool, optional): Whether to show a legend on the final plot. Defaults to True.
         legend_loc (str, optional): The location of the legend. Defaults to "upper right".
         time_unit (str): The unit to use for the x-axis. This will be formatted as "Time ({time_unit})". Defaults to "s"
-        voltage_unit (str): The unit to use for the y-axis. This will be formatted as "Voltage ({voltage_unit})". Defaults to "V". 
+        voltage_unit (str): The unit to use for the y-axis. This will be formatted as "Voltage ({voltage_unit})". Defaults to "V".
         line_label (str, optional): The label to use for the plotted line. Defaults to 'Resistance'.
         line_color (str, optional): The color to use for the plotted line. Defaults to 'black'.
         grid (bool, optional): Determines whether or not to show a gray grid on the plot. Defaults to False.
@@ -567,6 +572,68 @@ def series(
             figsize=figsize,
             line_color=line_color,
         )
+
+
+def suite(
+    filename: str,
+    generic_plot_title: str,
+    port: str = "COM3",
+    read_serial: bool = True,
+    threshold: float = RECOMMENDED_THRESHOLD,
+    min_plateau_length: float = RECOMMENDED_MIN_PLATEAU_LENGTH,
+    min_gap_length: float = RECOMMENDED_MIN_GAP_LENGTH,
+    normalize_regression: bool = True,
+    prepend_zero_to_plateaus: bool = False,
+) -> str:
+    """The simplist way to gather and plot data for single analog channel reading
+
+    Args:
+        filename (str): The name to use in a timestamped file if gthering data (read_serial is True), or the full filepath to plot (read_serial is False)
+        generic_plot_title (str): The title to use on all generated plots.
+        port (str, optional): The port to read serial data from. Defaults to 'COM3'.
+        read_serial (bool, optional): Whether or not to gather_data from the Arduino connected to the specified serial port. Defaults to True.
+        threshold (float, optional): The minimum voltage to be considered for a plateau. Defaults to 0.05
+        min_plateau_length (float, optional): The minimum length of a plateau to be logged. Defaults to 25
+        min_gap_length (float, optional): The minimum voltage drop to break a plateau. Defaults to 0.01
+        normalize_regression (bool, optional): Whether or not to normalize the linear regression generated such that the first voltage average is at 0V. Defaults to True.
+        prepend_zero_to_plateaus (bool, optional): Whether or not to prepend a reading of 0V to extracted plateaus, useful for very slightly malformed data. Defaults to False.
+
+    Returns:
+        str: _description_
+    """
+    from .serial_reader import gather_data
+
+    file = (
+        gather_data(port, filename, title=generic_plot_title)
+        if read_serial
+        else filename
+    )
+    series(
+        file,
+        threshold,
+        min_plateau_length,
+        min_gap_length,
+        plateaus=True,
+        title_default=generic_plot_title,
+        title_plateaus=generic_plot_title,
+    )
+    regression(
+        file,
+        threshold,
+        min_plateau_length,
+        min_gap_length,
+        generic_plot_title,
+        normalize=normalize_regression,
+        prepend_zero=prepend_zero_to_plateaus,
+    )
+    heatmap(
+        file,
+        threshold,
+        min_plateau_length,
+        min_gap_length,
+        generic_plot_title,
+        prepend_zero=prepend_zero_to_plateaus,
+    )
 
 
 # === MULTILAYER ===
@@ -751,39 +818,41 @@ def _plot_inferred_positions(
 
     vavg = np.asarray([average for average, _, _ in plateaus_t])
     vavgb = np.asarray([average for average, _, _ in plateaus_b])
-    
+
     avg_time, avg_timeb = [], []
     for _, start, end in plateaus_t:
         average_time = (t2[start] + t2[end]) / 2
         avg_time.append(average_time)
-    
+
     for _, start, end in plateaus_b:
         average_time = (t2[start] + t2[end]) / 2
         avg_timeb.append(average_time)
-    
+
     pos_x = vavg / 1.66
     pos_y = vavgb / 1.66
-    
+
     print(pos_y)
-    
+
     pos_x_real = np.asarray([1.5, 1.5, 1.5, 1.5, 1.5])
     pos_y_real = np.asarray([2.5, 2.0, 1.5, 1.0, 0.5])
-    
+
     error_x = pos_x - pos_x_real
     error_y = pos_y - pos_y_real
-    
+
     # dif_sq = np.sqrt((pos_x - pos_x_real) ** 2 + (pos_y - pos_y_real) ** 2) * 10  # mm
     # print("difference squared:")
     # print(dif_sq)
     # print("mean difference squared:")
     # print(np.mean(dif_sq))
-    
+
     plt.figure(figsize=(8, 6))
     plt.tick_params(labelsize=25, width=2, length=7)
     plt.scatter(
         pos_x, pos_y, c=range(len(pos_x)), s=50, marker="s", label="Inferred Position"
     )
-    plt.scatter(pos_x_real, pos_y_real, c=range(len(pos_x)), s=50, label="Actual Position")
+    plt.scatter(
+        pos_x_real, pos_y_real, c=range(len(pos_x)), s=50, label="Actual Position"
+    )
     plt.scatter(pos_x_real, pos_y_real, c=range(len(pos_x)), s=50, alpha=0.25)
     plt.xlabel("Actual Position (cm)", fontsize=25)
     plt.ylabel("Inferred Position(cm)", fontsize=25)
@@ -792,7 +861,7 @@ def _plot_inferred_positions(
     plt.ylim(0, 3.5)
     # plt.grid(True)
     plt.show()
-    
+
 
 # TODO
 def multilayer_voltage_analysis(

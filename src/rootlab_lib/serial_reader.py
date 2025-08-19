@@ -70,7 +70,7 @@ def gather_data(
         line_color (str, optional): The color to use for the plotted line. Defaults to 'black'.
         grid (bool, optional): Determines whether or not to show a gray grid on the plot. Defaults to False.
         figsize (Tuple[int, int], optional): The figsize to use for the figure. Defaults to (12,9).
-        
+
     Returns:
         Tuple(List[float], List[float], str): (voltage_series, time_series, output_file_path)
     """
@@ -281,7 +281,7 @@ def gather_pcb_data(
         vt3_color (str, optional): The color to use for the vt3 sense layer's line. If None, uses the default color cycle. Defaults to None.
         grid (bool, optional): Determines whether or not to show a gray grid on the plot. Defaults to False.
         figsize (Tuple[int, int], optional): The figsize to use for the figure. Defaults to (12,9).
-        
+
     Returns:
         Tuple(PCBDataOut, str): (PCBDataOut[VT, VT2, VT3, VB, VB2, VB3, t, t1, t2, index], output_file_path)
     """
@@ -401,11 +401,11 @@ def gather_pcb_data(
                 print("Parse error:", e)
 
         # Plot trimmed to `thresh`
-        line_top.set_data(t1[-thresh:], VT2[-thresh:])
-        line_bottom.set_data(t2[-thresh:], VB2[-thresh:])
-        line_vt1.set_data(t1[-thresh:], VT[-thresh:])
-        line_vt2.set_data(t1[-thresh:], VT2[-thresh:])
-        line_vt3.set_data(t1[-thresh:], VT3[-thresh:])
+        line_top.set_data(t1, VT2)
+        line_bottom.set_data(t2, VB2)
+        line_vt1.set_data(t1, VT)
+        line_vt2.set_data(t1, VT2)
+        line_vt3.set_data(t1, VT3)
 
         for ax in [ax1, ax2]:
             ax.relim()

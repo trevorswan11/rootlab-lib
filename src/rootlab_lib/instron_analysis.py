@@ -1,4 +1,5 @@
 """An extremely basic and minimal interface for working with data from the instron tensile tester"""
+
 import os
 from typing import List, Tuple
 import matplotlib.pyplot as plt
@@ -52,7 +53,7 @@ def single_stress_strain(
     legend_font_size: int = 20,
     color: str = None,
     grid: bool = False,
-    figsize: Tuple[int, int] = (12,9),
+    figsize: Tuple[int, int] = (12, 9),
 ) -> None:
     """Plots a single stress strain curve and saves the image generated
 
@@ -73,16 +74,16 @@ def single_stress_strain(
         color (str, optional): The color to use for each plot. If None, uses the default color. Defaults to None.
         grid (bool, optional): Determines whether or not to show a gray grid on the plot. Defaults to False.
         figsize (Tuple[int, int], optional): The figsize to use for the figure. Defaults to (12,9).
-    """    
+    """
     data = _read_numeric_data(filepath)
-    
+
     name = os.path.splitext(os.path.basename(filepath))[0]
     if timestamp:
         curr_date, curr_time = time.strftime("%y-%m-%d"), time.strftime("%H-%M-%S")
         name = f"{curr_date}_{name}_{curr_time}"
     os.makedirs(output_image_dir, exist_ok=True)
     image_path = os.path.join(output_image_dir, f"{name}.{output_image_ext}")
-    
+
     plt.figure(figsize=figsize)
     if color is not None:
         plt.plot(data[3], data[4], label=label, color=color)
@@ -91,7 +92,7 @@ def single_stress_strain(
     plt.title(title, fontsize=title_font_size)
     plt.xlabel(x_label, fontsize=axis_font_size)
     plt.ylabel(y_label, fontsize=axis_font_size)
-    if legend: 
+    if legend:
         plt.legend(fontsize=legend_font_size, loc=legend_loc)
     if grid:
         plt.grid(True)
@@ -100,7 +101,8 @@ def single_stress_strain(
     print(f"\tCurrent File: {os.path.basename(image_path)}")
     plt.savefig(image_path)
     plt.show()
-    
+
+
 def plot_multiple_stress_strain(
     filepaths: List[str],
     output_filename: str,
@@ -118,7 +120,7 @@ def plot_multiple_stress_strain(
     legend_font_size: int = 20,
     colors: List[str] = None,
     grid: bool = False,
-    figsize: Tuple[int, int] = (12,9),
+    figsize: Tuple[int, int] = (12, 9),
 ) -> None:
     """Plots multiple stress strain curves on the same plot
 
@@ -140,14 +142,14 @@ def plot_multiple_stress_strain(
         colors (List[str], optional): The colors to use for each plot. Must provide enough colors for every plot. If None, uses default colors. Defaults to None.
         grid (bool, optional): Determines whether or not to show a gray grid on the plot. Defaults to False.
         figsize (Tuple[int, int], optional): The figsize to use for the figure. Defaults to (12,9).
-    """    
+    """
     # format the image path
     if timestamp:
         curr_date, curr_time = time.strftime("%y-%m-%d"), time.strftime("%H-%M-%S")
         output_filename = f"{curr_date}_{output_filename}_{curr_time}"
     os.makedirs(output_image_dir, exist_ok=True)
     image_path = os.path.join(output_image_dir, f"{output_filename}.{output_image_ext}")
-    
+
     # Determine color usage
     use_usr_colors = False
     num_files = len(filepaths)
@@ -155,19 +157,19 @@ def plot_multiple_stress_strain(
         raise ValueError("Arg: 'colors' must be exactly as long as arg: 'filepaths'")
     elif colors is not None:
         use_usr_colors = True
-    
+
     # Right pad labels to match number of filepaths
     idx = len(labels) + 1
-    while (num_files > len(labels)):
+    while num_files > len(labels):
         labels.append(f"Specimen {idx}")
         idx += 1
-    
+
     # collect all of the data
     datum = []
     for filepath in filepaths:
         data = _read_numeric_data(filepath)
         datum.append([data[3], data[4]])
-    
+
     plt.figure(figsize=figsize)
     for i in range(len(datum)):
         if use_usr_colors:
@@ -177,7 +179,7 @@ def plot_multiple_stress_strain(
     plt.title(title, fontsize=title_font_size)
     plt.xlabel(x_label, fontsize=axis_font_size)
     plt.ylabel(y_label, fontsize=axis_font_size)
-    if legend: 
+    if legend:
         plt.legend(fontsize=legend_font_size, loc=legend_loc)
     if grid:
         plt.grid(True)
@@ -186,4 +188,3 @@ def plot_multiple_stress_strain(
     print(f"\tCurrent File: {os.path.basename(image_path)}")
     plt.savefig(image_path)
     plt.show()
-        

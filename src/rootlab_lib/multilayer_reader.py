@@ -77,7 +77,7 @@ def gather_data(
         bottom_color (str, optional): The color to use for the top layer. Defaults to 'blue'.
         grid (bool, optional): Determines whether or not to show a gray grid on the plot. Defaults to False.
         figsize (Tuple[int, int], optional): The figsize to use for the figure. Defaults to (12,9).
-        
+
     Returns:
         Tuple[List[float], List[float], List[float], List[float], str]: (R1_series, R2_series, R3_series, time_series, output_file_path)
     """

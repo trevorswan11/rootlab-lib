@@ -1,4 +1,5 @@
 """An interface for working with the Mark10 Tensile Tester"""
+
 from typing import Tuple, List
 import re
 import os
@@ -109,7 +110,7 @@ def estimate_modulus(
 
     Raises:
         ValueError: If there are not n_points in the data starting at start_point
-        
+
     Returns:
         float: The estimated young's modulus in the same units as the input force data
     """
@@ -224,7 +225,7 @@ def plot_single_stress_strain_from_extracted(
                 initial_length_mm,
                 speed_mm_min,
                 modulus_start_point,
-                modulus_n_points
+                modulus_n_points,
             )
 
             # Fit line through elastic region
@@ -248,7 +249,7 @@ def plot_single_stress_strain_from_extracted(
     plt.ylabel(y_label, fontsize=axis_font_size)
     if grid:
         plt.grid(True)
-        
+
     if legend:
         plt.legend(fontsize=legend_font_size, loc=legend_loc)
 
@@ -276,7 +277,7 @@ def plot_single_stress_strain_from_log_file(
     title_font_size: int = 30,
     legend_font_size: int = 20,
     legend: bool = False,
-    legend_loc: str = 'upper right',
+    legend_loc: str = "upper right",
     line_color: str = "black",
     yield_point_color: str = "red",
     modulus_line_color: str = "blue",
@@ -354,7 +355,7 @@ def plot_single_stress_strain_from_log_file(
         modulus_start_point,
         modulus_n_points,
     )
-    
+
 
 def plot_multiple_stress_strains(
     filepaths: List[str],
@@ -376,7 +377,7 @@ def plot_multiple_stress_strains(
     legend_font_size: int = 20,
     colors: List[str] = None,
     grid: bool = False,
-    figsize: Tuple[int, int] = (12,9),
+    figsize: Tuple[int, int] = (12, 9),
     to_csv: bool = False,
     trim_leading_zeros: bool = True,
 ) -> None:
@@ -408,7 +409,7 @@ def plot_multiple_stress_strains(
     """
     num_files = len(filepaths)
     assert num_files == len(widths_mm) == len(thicknesses_mm), "Mismatch in lengths"
-    
+
     # initial_lengths_mm can be different things
     if isinstance(initial_lengths_mm, list) and num_files != len(initial_lengths_mm):
         # the initial_length object is in fact an array, but not long enough
@@ -416,7 +417,7 @@ def plot_multiple_stress_strains(
     elif isinstance(initial_lengths_mm, float) or isinstance(initial_lengths_mm, int):
         # the initial_length object is just a number, so make it an array with values all equal to that number
         initial_lengths_mm = [initial_lengths_mm] * num_files
-            
+
     # speeds_mm_min can be different things
     if isinstance(speeds_mm_min, list) and num_files != len(speeds_mm_min):
         # the speeds_mm_min object is in fact an array, but not long enough
@@ -424,17 +425,17 @@ def plot_multiple_stress_strains(
     elif isinstance(speeds_mm_min, float) or isinstance(speeds_mm_min, int):
         # the speeds_mm_min object is just a number, so make it an array with values all equal to that number
         speeds_mm_min = [speeds_mm_min] * num_files
-        
+
     os.makedirs(output_image_dir, exist_ok=True)
     image_path = os.path.join(output_image_dir, f"{output_filename}.{output_image_ext}")
     use_usr_colors = colors is not None and len(colors) == num_files
-    
+
     # Right pad labels to match number of filepaths
     idx = len(labels) + 1
-    while (num_files > len(labels)):
+    while num_files > len(labels):
         labels.append(f"Specimen {idx}")
         idx += 1
-    
+
     # collect all of the data
     datum = []
     for i, filepath in enumerate(filepaths):
@@ -444,11 +445,16 @@ def plot_multiple_stress_strains(
         initial_length_mm = initial_lengths_mm[i]
         speed_mm_min = speeds_mm_min[i]
         stress, strain = to_stress_strain(
-            time_data, force_data, thickness_mm, width_mm, initial_length_mm, speed_mm_min
+            time_data,
+            force_data,
+            thickness_mm,
+            width_mm,
+            initial_length_mm,
+            speed_mm_min,
         )
         strain = [s * 100 for s in strain]
         datum.append([strain, stress])
-    
+
     plt.figure(figsize=figsize)
     for i in range(len(datum)):
         if use_usr_colors:
@@ -458,7 +464,7 @@ def plot_multiple_stress_strains(
     plt.title(title, fontsize=title_font_size)
     plt.xlabel(x_label, fontsize=axis_font_size)
     plt.ylabel(y_label, fontsize=axis_font_size)
-    if legend: 
+    if legend:
         plt.legend(fontsize=legend_font_size, loc=legend_loc)
     if grid:
         plt.grid(True)

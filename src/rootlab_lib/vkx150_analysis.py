@@ -49,7 +49,7 @@ def heightmap(
         axis_font_size (int, optional): The fontsize to use for the plot's axes. Defaults to 25.
         title_font_size (int, optional): The fontsize to use for the plot title. Defaults to 30.
         figsize (Tuple[int, int], optional): The figsize to use for the figure. Defaults to (12,9).
-        
+
     Returns:
         List[List[float]]: (height_data)
     """
